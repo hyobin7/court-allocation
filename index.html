@@ -34,21 +34,22 @@
     .layout {
       display: flex;
       flex-direction: row;
-      gap: 10px;
+      height: 100%;
     }
     .courts {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      flex: 0 0 35%;
-      min-width: 200px;
+      flex: 0 0 50%;
+      min-width: 140px;
     }
     .column {
       background: #fff;
       border: 2px solid #ccc;
       border-radius: 8px;
       padding: 10px;
-      min-height: 120px;
+      min-height: 100px;
+      flex-grow: 1;
     }
     .column h3 {
       text-align: center;
@@ -89,27 +90,24 @@
       border-color: #ff66b2;
     }
     #namePool {
-      flex: 1;
+      flex: 0 0 50%;
       background: #fff;
       border: 2px solid #ccc;
       border-radius: 8px;
       padding: 10px;
-      min-height: 400px;
+      min-height: 300px;
+      display: flex;
+      flex-direction: column;
     }
 
-    /* 모바일에서도 코트는 왼쪽 세로, 대기 목록은 오른쪽 고정 */
+    /* 전체 높이 고정 */
+    html, body {
+      height: 100%;
+    }
+
     @media (max-width: 768px) {
       .layout {
-        display: flex;
         flex-direction: row;
-        flex-wrap: nowrap;
-      }
-      .courts {
-        flex-direction: column;
-        min-width: 140px;
-      }
-      #namePool {
-        flex: 1;
       }
     }
   </style>
@@ -118,7 +116,7 @@
 
 <h2>배드민턴 코트 배정</h2>
 
-<textarea id="inputArea" placeholder="예시: 홍길동 3급 남\nKIM JIYEON 2급 여"></textarea>
+<textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
 <button class="btn" id="generateBtn" onclick="generateTags()">이름표 만들기</button>
 
 <div class="layout">
@@ -228,7 +226,6 @@
     });
   });
 
-  // Enter 키로 이름표 생성
   document.getElementById("inputArea").addEventListener("keydown", function(event) {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
