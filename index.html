@@ -96,12 +96,12 @@
 <h2>배드민턴 코트 배정</h2>
 
 <textarea id="inputArea" placeholder="예시: 홍길동 3급 남\n김영희 2급 여"></textarea>
-<button class="btn" onclick="generateTags()">이름표 만들기</button>
+<button class="btn" id="generateBtn" onclick="generateTags()">이름표 만들기</button>
 
 <div class="container">
   <div class="column" id="namePool">
     <div class="header">
-      <h3>이름 목록</h3>
+      <h3>대기</h3>
     </div>
   </div>
   <div class="column" id="court1">
@@ -127,10 +127,10 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 <script>
   function generateTags() {
-    const input = document.getElementById("inputArea").value.trim();
+    const inputArea = document.getElementById("inputArea");
+    const input = inputArea.value.trim();
     const lines = input.split("\n");
     const pool = document.getElementById("namePool");
-    pool.innerHTML = '<div class="header"><h3>이름 목록</h3></div>';
 
     lines.forEach(line => {
       if (line.trim() !== "") {
@@ -147,6 +147,8 @@
         pool.appendChild(tag);
       }
     });
+
+    inputArea.value = ""; // 입력창 초기화
   }
 
   function resetCourt(courtId) {
@@ -195,6 +197,14 @@
         setupLongPressToDelete(evt.item);
       }
     });
+  });
+
+  // 엔터 키 누르면 이름표 만들기 작동
+  document.getElementById("inputArea").addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      document.getElementById("generateBtn").click();
+    }
   });
 </script>
 
