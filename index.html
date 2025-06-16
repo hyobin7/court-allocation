@@ -31,26 +31,28 @@
       border-radius: 8px;
       margin-bottom: 20px;
     }
-    .container {
+    .layout {
       display: flex;
       flex-direction: row;
-      justify-content: space-around;
       gap: 10px;
-      flex-wrap: nowrap;
-      overflow-x: auto;
+    }
+    .courts {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 0 0 30%;
+      min-width: 200px;
     }
     .column {
       background: #fff;
       border: 2px solid #ccc;
       border-radius: 8px;
       padding: 10px;
-      min-width: 30%;
-      min-height: 250px;
-      flex: 1;
+      min-height: 120px;
     }
     .column h3 {
       text-align: center;
-      margin: 0;
+      margin: 0 0 5px 0;
     }
     .header {
       display: flex;
@@ -69,12 +71,12 @@
     .name-tag {
       padding: 8px;
       margin: 5px 0;
-      background-color: #d9eaff;
-      border: 1px solid #007bff;
+      border: 1px solid;
       border-radius: 4px;
       cursor: grab;
       text-align: center;
       user-select: none;
+      font-size: 14px;
     }
     .male {
       background-color: #cce5ff;
@@ -84,9 +86,21 @@
       background-color: #ffd6e8;
       border-color: #ff66b2;
     }
+    #namePool {
+      flex: 1;
+      background: #fff;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 400px;
+    }
     @media (max-width: 768px) {
-      .container {
+      .layout {
         flex-direction: column;
+      }
+      .courts {
+        flex-direction: row;
+        flex-wrap: wrap;
       }
     }
   </style>
@@ -98,28 +112,31 @@
 <textarea id="inputArea" placeholder="예시: 홍길동 3급 남\n김영희 2급 여"></textarea>
 <button class="btn" id="generateBtn" onclick="generateTags()">이름표 만들기</button>
 
-<div class="container">
+<div class="layout">
+  <div class="courts">
+    <div class="column" id="court1">
+      <div class="header">
+        <h3>1코트</h3>
+        <button class="reset-btn" onclick="resetCourt('court1')">리셋</button>
+      </div>
+    </div>
+    <div class="column" id="court2">
+      <div class="header">
+        <h3>2코트</h3>
+        <button class="reset-btn" onclick="resetCourt('court2')">리셋</button>
+      </div>
+    </div>
+    <div class="column" id="court3">
+      <div class="header">
+        <h3>3코트</h3>
+        <button class="reset-btn" onclick="resetCourt('court3')">리셋</button>
+      </div>
+    </div>
+  </div>
+
   <div class="column" id="namePool">
     <div class="header">
       <h3>대기</h3>
-    </div>
-  </div>
-  <div class="column" id="court1">
-    <div class="header">
-      <h3>1코트</h3>
-      <button class="reset-btn" onclick="resetCourt('court1')">리셋</button>
-    </div>
-  </div>
-  <div class="column" id="court2">
-    <div class="header">
-      <h3>2코트</h3>
-      <button class="reset-btn" onclick="resetCourt('court2')">리셋</button>
-    </div>
-  </div>
-  <div class="column" id="court3">
-    <div class="header">
-      <h3>3코트</h3>
-      <button class="reset-btn" onclick="resetCourt('court3')">리셋</button>
     </div>
   </div>
 </div>
@@ -138,17 +155,19 @@
         tag.className = "name-tag";
         const parts = line.trim().split(" ");
         if (parts.length >= 3) {
+          tag.innerText = parts[0] + " " + parts[1]; // 이름 + 급수만 표시
           const gender = parts[2];
           if (gender === "남") tag.classList.add("male");
           else if (gender === "여") tag.classList.add("female");
+        } else {
+          tag.innerText = line.trim();
         }
-        tag.innerText = line;
         setupLongPressToDelete(tag);
         pool.appendChild(tag);
       }
     });
 
-    inputArea.value = ""; // 입력창 초기화
+    inputArea.value = "";
   }
 
   function resetCourt(courtId) {
@@ -173,7 +192,6 @@
     element.addEventListener("touchend", function(e) {
       clearTimeout(pressTimer);
     });
-
     element.addEventListener("contextmenu", function(e) {
       e.preventDefault();
       if (confirm("이 이름표를 삭제할까요?")) {
@@ -199,7 +217,7 @@
     });
   });
 
-  // 엔터 키 누르면 이름표 만들기 작동
+  // Enter 키로 이름표 생성
   document.getElementById("inputArea").addEventListener("keydown", function(event) {
     if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();
