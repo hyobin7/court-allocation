@@ -834,5 +834,23 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 });
+</script><script>
+function createNameTag() {
+  const gender = document.getElementById('genderInput').value;
+  const name = document.getElementById('nameInput').value;
+  const level = document.getElementById('levelInput').value;
+  if (!gender || !name || !level) return;
+
+  const tag = document.createElement('div');
+  tag.className = 'name-tag ' + (gender === '남' ? 'male' : 'female');
+  tag.textContent = `${gender} ${name} ${level}`;
+  tag.draggable = true;
+  tag.id = 'tag-' + Date.now();
+  tag.addEventListener('dragstart', event => {
+    event.dataTransfer.setData('text/plain', tag.id);
+  });
+
+  document.getElementById('namePool').appendChild(tag);
+}
 </script></body>
 </html>
