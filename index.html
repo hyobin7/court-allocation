@@ -779,21 +779,25 @@ document.getElementById("thCount").onclick = () => {
 </script>
 <script>
 function forceEqualHeight() {
-  const courtColumn = document.querySelector('.courts');
-  const namePool = document.getElementById('namePool');
-  const stats = document.getElementById('statsTableContainer');
+  const courtBox = document.querySelector('.courts');
+  const courtHeight = courtBox.getBoundingClientRect().height;
 
-  if (courtColumn && namePool && stats) {
-    const height = courtColumn.offsetHeight;
-    namePool.style.height = height + 'px';
-    stats.style.height = height + 'px';
+  const targets = ['#namePool', '#statsTableContainer'];
+  targets.forEach(id => {
+    const el = document.querySelector(id);
+    if (el) {
+      el.style.minHeight = courtHeight + 'px';
+      el.style.height = courtHeight + 'px';
+      el.style.display = 'flex';
+      el.style.flexDirection = 'column';
 
-    // 내부 콘텐츠까지 높이 동기화
-    const namePoolInner = namePool.querySelector('.column');
-    const statsInner = stats.querySelector('table');
-    if (namePoolInner) namePoolInner.style.height = height + 'px';
-    if (statsInner) statsInner.style.height = height + 'px';
-  }
+      const inner = el.querySelector('.column') || el.querySelector('table');
+      if (inner) {
+        inner.style.flexGrow = '1';
+        inner.style.height = '100%';
+      }
+    }
+  });
 }
 
 window.addEventListener('load', forceEqualHeight);
