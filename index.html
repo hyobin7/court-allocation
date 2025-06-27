@@ -778,16 +778,30 @@ document.getElementById("thCount").onclick = () => {
 };
 </script>
 <script>
-function forceEqualHeight() {
-  const courtBox = document.querySelector('.courts');
-  const courtHeight = courtBox.getBoundingClientRect().height;
+function waitAndForceEqualHeight() {
+  let attempt = 0;
+  const maxAttempts = 20;
 
+  const interval = setInterval(() => {
+    const courtBox = document.querySelector('.courts');
+    const height = courtBox?.getBoundingClientRect().height || 0;
+
+    if (height > 100 || attempt > maxAttempts) {
+      clearInterval(interval);
+      applyHeightSync(height);
+    }
+
+    attempt++;
+  }, 100);
+}
+
+function applyHeightSync(height) {
   const targets = ['#namePool', '#statsTableContainer'];
   targets.forEach(id => {
     const el = document.querySelector(id);
     if (el) {
-      el.style.minHeight = courtHeight + 'px';
-      el.style.height = courtHeight + 'px';
+      el.style.minHeight = height + 'px';
+      el.style.height = height + 'px';
       el.style.display = 'flex';
       el.style.flexDirection = 'column';
 
@@ -800,9 +814,7 @@ function forceEqualHeight() {
   });
 }
 
-window.addEventListener('load', forceEqualHeight);
-window.addEventListener('resize', () => {
-  setTimeout(forceEqualHeight, 100);
-});
+window.addEventListener('load', waitAndForceEqualHeight);
+window.addEventListener('resize', waitAndForceEqualHeight);
 </script></body>
 </html>
