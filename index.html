@@ -42,10 +42,6 @@
       min-width: 140px;
     }
     .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-
       background: #fff;
       border: 2px solid #ccc;
       border-radius: 8px;
@@ -72,12 +68,6 @@
       cursor: pointer;
     }
     .name-tag {
-  width: calc(50% - 10px);
-  display: inline-block;
-  vertical-align: top;
-  box-sizing: border-box;
-  margin: 5px;
-  height: 50px;
       padding: 8px;
       margin: 5px 0;
       border: 1px solid;
@@ -109,236 +99,15 @@
     }
     html, body { height: 100%; }
     @media (max-width: 768px) {
-      .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
- min-height: 16px !important; }
+      .column { min-height: 16px !important; }
       .layout { flex-direction: row; }
     }
-    .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
- min-height: 80px !important; }
+    .column { min-height: 80px !important; }
     .courts { gap: 5px !important; }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
 </head>
 <body>
 <h2>배드민턴 코트 배정</h2>
@@ -384,20 +153,7 @@ document.getElementById("thCount").onclick = () => {
     <div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button></div></div>
     <div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button></div></div>
   </div>
-  
   <div class="column" id="namePool"><div class="header"><h3>대기</h3></div></div>
-  <div class="column" id="statsTableContainer" style="min-width: 200px; background: #fff;">
-    <table border="1" style="width: 100%; border-collapse: collapse; font-size: 14px;">
-      <thead>
-        <tr>
-          <th id="thName" style="cursor:pointer;">이름 🔽</th>
-          <th id="thCount" style="cursor:pointer;">횟수</th>
-        </tr>
-      </thead>
-      <tbody id="statsTableBody"></tbody>
-    </table>
-  </div>
-
 </div>
 
 <script>
@@ -495,7 +251,6 @@ function moveAllToCourt(fromId, toId) {
       const court = evt.to.id;
       const key = evt.item.dataset.key;
       db.ref("nameTags/" + key).update({ court });
-      if (["court1","court2","court3","court4"].includes(court)) updateCount(evt.item.textContent.split(" ")[0]);
     }
   });
 });
@@ -530,77 +285,6 @@ window.onload = () => {
     }
   });
 };
-
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
 </script>
 </body>
 </html>
