@@ -778,19 +778,22 @@ document.getElementById("thCount").onclick = () => {
 };
 </script>
 <script>
-function syncColumnHeights() {
+function forceEqualHeight() {
   const courtColumn = document.querySelector('.courts');
   const namePool = document.getElementById('namePool');
   const stats = document.getElementById('statsTableContainer');
 
   if (courtColumn && namePool && stats) {
-    const courtHeight = courtColumn.scrollHeight;
-    namePool.style.minHeight = courtHeight + 'px';
-    stats.style.minHeight = courtHeight + 'px';
+    const height = courtColumn.offsetHeight;
+    namePool.style.height = height + 'px';
+    stats.style.height = height + 'px';
   }
 }
 
-window.addEventListener('load', syncColumnHeights);
-window.addEventListener('resize', syncColumnHeights);
+// 적용 시점 확대
+window.addEventListener('load', forceEqualHeight);
+window.addEventListener('resize', () => {
+  setTimeout(forceEqualHeight, 100);
+});
 </script></body>
 </html>
