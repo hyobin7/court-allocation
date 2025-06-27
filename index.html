@@ -777,5 +777,17 @@ document.getElementById("thCount").onclick = () => {
   renderTable();
 };
 </script>
-</body>
+<script>
+window.onload = function () {
+  const courtColumn = document.querySelector('.courts');
+  const namePool = document.getElementById('namePool');
+  const stats = document.getElementById('statsTableContainer');
+
+  if (courtColumn && namePool && stats) {
+    const courtHeight = courtColumn.offsetHeight;
+    namePool.style.height = courtHeight + 'px';
+    stats.style.height = courtHeight + 'px';
+  }
+};
+</script></body>
 </html>
