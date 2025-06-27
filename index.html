@@ -4,8 +4,7 @@
 <html lang="ko">
 <head>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<style>
-    .main-container {
+<style>.main-container {
         display: flex;
         justify-content: space-between;
         flex-wrap: nowrap;
@@ -44,7 +43,119 @@
             width: 100% !important;
         }
     }
-    </style>
+
+
+@media (max-width: 1024px) {
+  .layout {
+    flex-direction: column !important;
+  }
+  .courts, #namePool, #statsTableContainer {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column !important;
+  }
+  .courts, #namePool, #statsTableContainer {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
+
+@media (max-width: 1024px) {
+  .layout > div {
+    flex-direction: column !important;
+  }
+  .layout > div > div {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout > div {
+    flex-direction: column !important;
+  }
+  .layout > div > div {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+
+.layout > div {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+/* 데스크탑 ~1200px 이하 */
+@media (max-width: 1200px) {
+  .courts { width: 25% !important; }
+  #namePool { width: 30% !important; }
+  #statsTableContainer { width: 45% !important; }
+}
+
+/* 태블릿 ~992px 이하 */
+@media (max-width: 992px) {
+  .courts { width: 30% !important; }
+  #namePool { width: 30% !important; }
+  #statsTableContainer { width: 40% !important; }
+}
+
+/* 모바일 ~768px 이하 */
+
+
+@media (max-width: 768px) {
+  .layout > div {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+  }
+  .courts, #namePool, #statsTableContainer {
+    width: auto !important;
+    max-width: none !important;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .layout > div {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+  }
+  .courts, #namePool, #statsTableContainer {
+    width: auto !important;
+    max-width: none !important;
+    flex: 1 1 auto;
+  }
+}
+
+
+/* 기본 데스크탑 */
+.courts { flex: 0 0 22%; }
+#namePool { flex: 0 0 18%; }
+#statsTableContainer { flex: 1; }
+
+/* 데스크탑 ~1200px 이하 */
+@media (max-width: 1200px) {
+  .courts { flex: 0 0 25% !important; }
+  #namePool { flex: 0 0 30% !important; }
+  #statsTableContainer { flex: 0 0 45% !important; }
+}
+
+/* 태블릿 ~992px 이하 */
+@media (max-width: 992px) {
+  .courts { flex: 0 0 30% !important; }
+  #namePool { flex: 0 0 30% !important; }
+  #statsTableContainer { flex: 0 0 40% !important; }
+}
+</style>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>배드민턴 코트 배정</title>
@@ -449,15 +560,12 @@ document.getElementById("thCount").onclick = () => {
 </div>
 </div>
 </div>
-<div class="layout" style="display: flex; flex-direction: row; gap: 10px; flex-wrap: nowrap; align-items: flex-start; justify-content: space-between;">
-<div class="courts" style="flex: none; min-width: 160px; max-width: 22%; width: 22%; display: flex; flex-direction: column; gap: 10px;">
+<div class="layout" style="display: flex; flex-direction: row; gap: 10px; flex-wrap: nowrap; align-items: flex-start; justify-content: space-between;"><div style="display: flex; flex-direction: row !important; gap: 10px; width: 100%; align-items: flex-start; flex-wrap: nowrap;"><div class="courts" style="flex: none; min-width: 160px; max-width: 22%; width: 22%; display: flex; flex-direction: column; gap: 10px;">
 <div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button></div></div>
 <div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button></div></div>
 <div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button></div></div>
 <div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button></div></div>
-</div>
-<div class="column" id="namePool" style="flex: none; min-width: 160px; max-width: 18%; width: 18%; height: 100%; display: flex; flex-direction: column; justify-content: stretch;"><div class="header"><h3>대기</h3></div></div>
-<div class="column" id="statsTableContainer" style="flex: none; min-width: 240px; max-width: 40%; width: 40%; height: 100%;">
+</div><div class="column" id="namePool" style="flex: none; min-width: 160px; max-width: 18%; width: 18%; height: 100%; display: flex; flex-direction: column; justify-content: stretch;"><div class="header"><h3>대기</h3></div></div><div class="column" id="statsTableContainer" style="flex: none; min-width: 240px; max-width: 40%; width: 40%; height: 100%;">
 <table border="1" style="width: 100%; border-collapse: collapse; font-size: 14px;">
 <thead>
 <tr>
@@ -467,8 +575,7 @@ document.getElementById("thCount").onclick = () => {
 </thead>
 <tbody id="statsTableBody"></tbody>
 </table>
-</div>
-</div>
+</div></div></div>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
