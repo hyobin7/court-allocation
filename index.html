@@ -414,23 +414,112 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const tagRefs = {};
 
-
-
 function generateTags() {
   const input = document.getElementById("inputArea").value.trim();
-  const lines = input.split("
-");
+  const lines = input.split("\n");
   lines.forEach(line => {
     const parts = line.trim().split(" ");
     if (parts.length >= 3) {
-      const gender = parts[0];
-      const name = parts[1].toUpperCase();
-      const level = parts[2];
+      const name = parts[0].toUpperCase();
+      const level = parts[1];
+      const gender = parts[2];
       db.ref("nameTags").push({ name, level, gender, court: "namePool" });
     }
   });
   document.getElementById("inputArea").value = "";
 }
+
+function createTag(key, data) {
+  const tag = document.createElement("div");
+  tag.className = "name-tag";
+  tag.dataset.key = key;
+  tag.textContent = `${data.name} ${data.level}`.toUpperCase();
+  tag.classList.add(data.gender === "남" ? "male" : "female");
+  tag.addEventListener("contextmenu", e => {
+    e.preventDefault();
+    if (confirm("이 이름표를 삭제할까요?")) {
+      db.ref("nameTags/" + key).remove();
+    }
+  });
+  tag.addEventListener("touchend", function(e) {
+    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
+      tag.dataset.lastTouch = Date.now();
+    } else {
+      db.ref("nameTags/" + key).remove();
+      tag.dataset.lastTouch = 0;
+    }
+  });
+  return tag;
+}
+
+function resetCourt(courtId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === courtId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
+
+function resetToWait(waitId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === waitId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
+
+function moveAllToCourt(fromId, toId) {
+  const fromEl = document.getElementById(fromId);
+  const toEl = document.getElementById(toId);
+  const tags = fromEl.querySelectorAll('.name-tag');
+  let countInCourt = toEl.querySelectorAll('.name-tag').length;
+  tags.forEach(tag => {
+    if (countInCourt < 4) {
+      toEl.appendChild(tag);
+      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
+      countInCourt++;
+    }
+  });
+}
+
+["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
+  new Sortable(document.getElementById(id), {
+    group: "shared",
+    animation: 150,
+    onAdd: function(evt) {
+      if (evt.to.querySelectorAll('.name-tag').length > 4) {
+        evt.from.appendChild(evt.item);
+        alert("각 칸에는 최대 4명까지만 배정할 수 있습니다.");
+        return;
+      }
+      const court = evt.to.id;
+      const key = evt.item.dataset.key;
+      db.ref("nameTags/" + key).update({ court });
+      if (["court1","court2","court3","court4"].includes(court)) updateCount(evt.item.textContent.split(" ")[0]);
+    }
+  });
+});
+
+db.ref("nameTags").on("child_added", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  const tag = createTag(key, data);
+  tagRefs[key] = tag;
+  document.getElementById(data.court || "namePool").appendChild(tag);
+});
+
+db.ref("nameTags").on("child_removed", snap => {
+  const tag = tagRefs[snap.key];
+  if (tag) tag.remove();
+  delete tagRefs[snap.key];
+});
+
+db.ref("nameTags").on("child_changed", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  const tag = tagRefs[key];
+  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
+});
 
 window.onload = () => {
   document.getElementById("generateBtn").onclick = generateTags;
@@ -441,8 +530,6 @@ window.onload = () => {
     }
   });
 };
-
-
 
 let countMap = {};
 let sortKey = 'name';
