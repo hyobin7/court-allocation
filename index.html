@@ -644,7 +644,12 @@ function resetToWait(waitId) {
   });
 }
 
-function moveAllToCourt(fromId, toId) {
+function moveAllToCourt(waitId, courtId) {
+  const waitDiv = document.getElementById(waitId);
+  const courtDiv = document.getElementById(courtId);
+  const children = Array.from(waitDiv.children);
+  children.forEach(nameTag => moveToCourt(nameTag, courtId));
+}
   const fromEl = document.getElementById(fromId);
   const toEl = document.getElementById(toId);
   const tags = fromEl.querySelectorAll('.name-tag');
@@ -775,8 +780,7 @@ document.getElementById("thCount").onclick = () => {
   sortKey = "count";
   sortAsc = !sortAsc;
   renderTable();
-};
-</script>
+};</script>
 <script>
 function waitAndForceEqualHeight() {
   let attempt = 0;
