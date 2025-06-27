@@ -1,11 +1,196 @@
 
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>배드민턴 코트 배정</title>
-  <style>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<style>.main-container {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 10px;
+    }
+    .courts {
+        flex: none;
+        width: 22%;
+        max-width: 22%;
+    }
+    #namePool {
+        flex: none;
+        width: 22%;
+        max-width: 22%;
+    }
+    #assignmentTable {
+        flex: none;
+        width: 50%;
+        max-width: 50%;
+    }
+    @media (max-width: 768px) {
+        .main-container {
+            flex-direction: column !important;
+        }
+        .court, #namePool, #assignmentTable {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .main-container {
+            flex-direction: column !important;
+        }
+        .court, #namePool, #assignmentTable {
+            width: 100% !important;
+        }
+    }
+
+
+@media (max-width: 1024px) {
+  .layout {
+    flex-direction: column !important;
+  }
+  .courts, #namePool, #statsTableContainer {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column !important;
+  }
+  .courts, #namePool, #statsTableContainer {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+}
+
+
+@media (max-width: 1024px) {
+  .layout > div {
+    flex-direction: column !important;
+  }
+  .layout > div > div {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout > div {
+    flex-direction: column !important;
+  }
+  .layout > div > div {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+
+.layout > div {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+/* 데스크탑 ~1200px 이하 */
+@media (max-width: 1200px) {
+  .courts { width: 25% !important; }
+  #namePool { width: 30% !important; }
+  #statsTableContainer { width: 45% !important; }
+}
+
+/* 태블릿 ~992px 이하 */
+@media (max-width: 992px) {
+  .courts { width: 30% !important; }
+  #namePool { width: 30% !important; }
+  #statsTableContainer { width: 40% !important; }
+}
+
+/* 모바일 ~768px 이하 */
+
+
+@media (max-width: 768px) {
+  .layout > div {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+  }
+  .courts, #namePool, #statsTableContainer {
+    width: auto !important;
+    max-width: none !important;
+  }
+}
+
+
+@media (max-width: 768px) {
+  .layout > div {
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+  }
+  .courts, #namePool, #statsTableContainer {
+    width: auto !important;
+    max-width: none !important;
+    flex: 1 1 auto;
+  }
+}
+
+
+/* 기본 데스크탑 */
+.courts { flex: 0 0 22%; }
+#namePool { flex: 0 0 18%; }
+#statsTableContainer { flex: 1; }
+
+/* 데스크탑 ~1200px 이하 */
+@media (max-width: 1200px) {
+  .courts { flex: 0 0 25% !important; }
+  #namePool { flex: 0 0 30% !important; }
+  #statsTableContainer { flex: 0 0 45% !important; }
+}
+
+/* 태블릿 ~992px 이하 */
+@media (max-width: 992px) {
+  .courts { flex: 0 0 30% !important; }
+  #namePool { flex: 0 0 30% !important; }
+  #statsTableContainer { flex: 0 0 40% !important; }
+}
+</style>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>배드민턴 코트 배정</title>
+<style>
+    .main-container {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: nowrap;
+        gap: 10px;
+    }
+    .courts {
+        flex: none;
+        width: 22%;
+        max-width: 22%;
+    }
+    #namePool {
+        flex: none;
+        width: 22%;
+        max-width: 22%;
+    }
+    #assignmentTable {
+        flex: none;
+        width: 50%;
+        max-width: 50%;
+    }
+    @media (max-width: 768px) {
+        .main-container {
+            flex-direction: column !important;
+        }
+        .court, #namePool, #assignmentTable {
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+    }
+    
     body {
       font-family: 'Arial', sans-serif;
       margin: 0;
@@ -123,7 +308,7 @@
  min-height: 80px !important; }
     .courts { gap: 5px !important; }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
 let countMap = {};
 let sortKey = 'name';
 let sortAsc = true;
@@ -195,7 +380,7 @@ document.getElementById("thCount").onclick = () => {
 };
 
 </script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
 let countMap = {};
 let sortKey = 'name';
 let sortAsc = true;
@@ -267,7 +452,7 @@ document.getElementById("thCount").onclick = () => {
 };
 
 </script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
 let countMap = {};
 let sortKey = 'name';
 let sortAsc = true;
@@ -339,67 +524,58 @@ document.getElementById("thCount").onclick = () => {
 };
 
 </script>
-</head>
+</meta></head>
 <body>
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
 <button class="btn" id="generateBtn">이름표 만들기</button>
-
 <div class="waiting-extra" style="display: flex; gap: 10px; margin-bottom: 20px;">
-  <div class="column" id="wait1">
-    <div class="header" style="flex-direction: column; align-items: flex-start;">
-      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-        <h3 style="margin: 0;">대기 1</h3>
-        <button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
-      </div>
-      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
-      </div>
-    </div>
-  </div>
-  <div class="column" id="wait2">
-    <div class="header" style="flex-direction: column; align-items: flex-start;">
-      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-        <h3 style="margin: 0;">대기 2</h3>
-        <button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
-      </div>
-      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
-      </div>
-    </div>
-  </div>
+<div class="column" id="wait1">
+<div class="header" style="flex-direction: column; align-items: flex-start;">
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+<h3 style="margin: 0;">대기 1</h3>
+<button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
 </div>
-
-<div class="layout">
-  <div class="courts">
-    <div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button></div></div>
-    <div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button></div></div>
-    <div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button></div></div>
-    <div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button></div></div>
-  </div>
-  
-  <div class="column" id="namePool"><div class="header"><h3>대기</h3></div></div>
-  <div class="column" id="statsTableContainer" style="min-width: 200px; background: #fff;">
-    <table border="1" style="width: 100%; border-collapse: collapse; font-size: 14px;">
-      <thead>
-        <tr>
-          <th id="thName" style="cursor:pointer;">이름 🔽</th>
-          <th id="thCount" style="cursor:pointer;">횟수</th>
-        </tr>
-      </thead>
-      <tbody id="statsTableBody"></tbody>
-    </table>
-  </div>
-
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
 </div>
-
+</div>
+</div>
+<div class="column" id="wait2">
+<div class="header" style="flex-direction: column; align-items: flex-start;">
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+<h3 style="margin: 0;">대기 2</h3>
+<button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
+</div>
+</div>
+</div>
+</div>
+<div class="layout" style="display: flex; flex-direction: row; gap: 10px; flex-wrap: nowrap; align-items: flex-start; justify-content: space-between;"><div style="display: flex; flex-direction: row !important; gap: 10px; width: 100%; align-items: flex-start; flex-wrap: nowrap; align-items: stretch;; align-items: stretch;"><div class="courts" style="flex: none; min-width: 160px; max-width: 22%; width: 22%; display: flex; flex-direction: column; gap: 10px;; display: flex; flex-direction: column; height: 100%;">
+<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button></div></div>
+<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button></div></div>
+<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button></div></div>
+<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button></div></div>
+</div><div class="column" id="namePool" style="flex: none; min-width: 160px; max-width: 18%; width: 18%; height: 100%; display: flex; flex-direction: column; justify-content: stretch; height: 100%; align-self: stretch;; display: flex; flex-direction: column; height: 100%;"><div class="header"><h3>대기</h3></div></div><div class="column" id="statsTableContainer" style="flex: none; min-width: 240px; max-width: 40%; width: 40%; height: 100%; height: 100%; align-self: stretch;; display: flex; flex-direction: column; height: 100%;">
+<table border="1" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+<thead>
+<tr>
+<th id="thName" style="cursor:pointer;">이름 🔽</th>
+<th id="thCount" style="cursor:pointer;">횟수</th>
+</tr>
+</thead>
+<tbody id="statsTableBody"></tbody>
+</table>
+</div></div></div>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
@@ -414,23 +590,112 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 const tagRefs = {};
 
-
-
 function generateTags() {
   const input = document.getElementById("inputArea").value.trim();
-  const lines = input.split("
-");
+  const lines = input.split("\n");
   lines.forEach(line => {
     const parts = line.trim().split(" ");
     if (parts.length >= 3) {
-      const gender = parts[0];
-      const name = parts[1].toUpperCase();
-      const level = parts[2];
+      const name = parts[0].toUpperCase();
+      const level = parts[1];
+      const gender = parts[2];
       db.ref("nameTags").push({ name, level, gender, court: "namePool" });
     }
   });
   document.getElementById("inputArea").value = "";
 }
+
+function createTag(key, data) {
+  const tag = document.createElement("div");
+  tag.className = "name-tag";
+  tag.dataset.key = key;
+  tag.textContent = `${data.name} ${data.level}`.toUpperCase();
+  tag.classList.add(data.gender === "남" ? "male" : "female");
+  tag.addEventListener("contextmenu", e => {
+    e.preventDefault();
+    if (confirm("이 이름표를 삭제할까요?")) {
+      db.ref("nameTags/" + key).remove();
+    }
+  });
+  tag.addEventListener("touchend", function(e) {
+    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
+      tag.dataset.lastTouch = Date.now();
+    } else {
+      db.ref("nameTags/" + key).remove();
+      tag.dataset.lastTouch = 0;
+    }
+  });
+  return tag;
+}
+
+function resetCourt(courtId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === courtId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
+
+function resetToWait(waitId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === waitId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
+
+function moveAllToCourt(fromId, toId) {
+  const fromEl = document.getElementById(fromId);
+  const toEl = document.getElementById(toId);
+  const tags = fromEl.querySelectorAll('.name-tag');
+  let countInCourt = toEl.querySelectorAll('.name-tag').length;
+  tags.forEach(tag => {
+    if (countInCourt < 4) {
+      toEl.appendChild(tag);
+      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
+      countInCourt++;
+    }
+  });
+}
+
+["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
+  new Sortable(document.getElementById(id), {
+    group: "shared",
+    animation: 150,
+    onAdd: function(evt) {
+      if (evt.to.id !== 'namePool' && evt.to.querySelectorAll('.name-tag').length > 4) {
+        evt.from.appendChild(evt.item);
+        alert("각 칸에는 최대 4명까지만 배정할 수 있습니다.");
+        return;
+      }
+      const court = evt.to.id;
+      const key = evt.item.dataset.key;
+      db.ref("nameTags/" + key).update({ court });
+      if (["court1","court2","court3","court4"].includes(court)) updateCount(evt.item.textContent.split(" ")[0]);
+    }
+  });
+});
+
+db.ref("nameTags").on("child_added", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  const tag = createTag(key, data);
+  tagRefs[key] = tag;
+  document.getElementById(data.court || "namePool").appendChild(tag);
+});
+
+db.ref("nameTags").on("child_removed", snap => {
+  const tag = tagRefs[snap.key];
+  if (tag) tag.remove();
+  delete tagRefs[snap.key];
+});
+
+db.ref("nameTags").on("child_changed", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  const tag = tagRefs[key];
+  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
+});
 
 window.onload = () => {
   document.getElementById("generateBtn").onclick = generateTags;
@@ -441,8 +706,6 @@ window.onload = () => {
     }
   });
 };
-
-
 
 let countMap = {};
 let sortKey = 'name';
@@ -513,7 +776,45 @@ document.getElementById("thCount").onclick = () => {
   sortAsc = !sortAsc;
   renderTable();
 };
-
 </script>
-</body>
+<script>
+function waitAndForceEqualHeight() {
+  let attempt = 0;
+  const maxAttempts = 20;
+
+  const interval = setInterval(() => {
+    const courtBox = document.querySelector('.courts');
+    const height = courtBox?.getBoundingClientRect().height || 0;
+
+    if (height > 100 || attempt > maxAttempts) {
+      clearInterval(interval);
+      applyHeightSync(height);
+    }
+
+    attempt++;
+  }, 100);
+}
+
+function applyHeightSync(height) {
+  const targets = ['#namePool', '#statsTableContainer'];
+  targets.forEach(id => {
+    const el = document.querySelector(id);
+    if (el) {
+      el.style.minHeight = height + 'px';
+      el.style.height = height + 'px';
+      el.style.display = 'flex';
+      el.style.flexDirection = 'column';
+
+      const inner = el.querySelector('.column') || el.querySelector('table');
+      if (inner) {
+        inner.style.flexGrow = '1';
+        inner.style.height = '100%';
+      }
+    }
+  });
+}
+
+window.addEventListener('load', waitAndForceEqualHeight);
+window.addEventListener('resize', waitAndForceEqualHeight);
+</script></body>
 </html>
