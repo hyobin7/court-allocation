@@ -787,10 +787,15 @@ function forceEqualHeight() {
     const height = courtColumn.offsetHeight;
     namePool.style.height = height + 'px';
     stats.style.height = height + 'px';
+
+    // 내부 콘텐츠까지 높이 동기화
+    const namePoolInner = namePool.querySelector('.column');
+    const statsInner = stats.querySelector('table');
+    if (namePoolInner) namePoolInner.style.height = height + 'px';
+    if (statsInner) statsInner.style.height = height + 'px';
   }
 }
 
-// 적용 시점 확대
 window.addEventListener('load', forceEqualHeight);
 window.addEventListener('resize', () => {
   setTimeout(forceEqualHeight, 100);
