@@ -644,12 +644,7 @@ function resetToWait(waitId) {
   });
 }
 
-function moveAllToCourt(waitId, courtId) {
-  const waitDiv = document.getElementById(waitId);
-  const courtDiv = document.getElementById(courtId);
-  const children = Array.from(waitDiv.children);
-  children.forEach(nameTag => moveToCourt(nameTag, courtId));
-}
+function moveAllToCourt(fromId, toId) {
   const fromEl = document.getElementById(fromId);
   const toEl = document.getElementById(toId);
   const tags = fromEl.querySelectorAll('.name-tag');
@@ -780,7 +775,8 @@ document.getElementById("thCount").onclick = () => {
   sortKey = "count";
   sortAsc = !sortAsc;
   renderTable();
-};</script>
+};
+</script>
 <script>
 function waitAndForceEqualHeight() {
   let attempt = 0;
@@ -820,37 +816,5 @@ function applyHeightSync(height) {
 
 window.addEventListener('load', waitAndForceEqualHeight);
 window.addEventListener('resize', waitAndForceEqualHeight);
-</script><script>
-document.addEventListener('DOMContentLoaded', function () {
-  const inputs = ['genderInput', 'nameInput', 'levelInput'];
-  inputs.forEach(id => {
-    const input = document.getElementById(id);
-    if (input) {
-      input.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-          createNameTag();
-        }
-      });
-    }
-  });
-});
-</script><script>
-function createNameTag() {
-  const gender = document.getElementById('genderInput').value;
-  const name = document.getElementById('nameInput').value;
-  const level = document.getElementById('levelInput').value;
-  if (!gender || !name || !level) return;
-
-  const tag = document.createElement('div');
-  tag.className = 'name-tag ' + (gender === '남' ? 'male' : 'female');
-  tag.textContent = `${gender} ${name} ${level}`;
-  tag.draggable = true;
-  tag.id = 'tag-' + Date.now();
-  tag.addEventListener('dragstart', event => {
-    event.dataTransfer.setData('text/plain', tag.id);
-  });
-
-  document.getElementById('namePool').appendChild(tag);
-}
 </script></body>
 </html>
