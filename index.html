@@ -488,6 +488,38 @@ function sortNamePoolByCount() {
     return aCount - bCount;
   });
   tags.forEach(tag => pool.appendChild(tag));
-}</script>
+}
+
+
+document.getElementById("createTagBtn").addEventListener("click", createNameTag);
+document.getElementById("nameInput").addEventListener("keypress", function (e) {
+  if (e.key === "Enter") {
+    createNameTag();
+  }
+});
+
+function createNameTag() {
+  const input = document.getElementById("nameInput").value.trim();
+  if (!input) return;
+  const parts = input.split(/\s+/);
+  if (parts.length < 3) return;
+
+  const [name, grade, gender] = parts;
+  const tag = document.createElement("div");
+  tag.className = "name-tag " + (gender === "남" ? "male" : "female");
+  tag.innerHTML = `
+    <div class="count-badge">0</div>
+    ${name} ${grade}
+  `;
+  tag.draggable = true;
+  tag.addEventListener("dragstart", handleDragStart);
+  tag.addEventListener("dblclick", function () {
+    tag.remove();
+  });
+
+  document.querySelector("#namePool .tag-container").appendChild(tag);
+  document.getElementById("nameInput").value = "";
+}
+</script>
 </body>
 </html>
