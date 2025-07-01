@@ -46,6 +46,7 @@
     }
     
 .name-tag .count-badge {
+  pointer-events: none;
   position: absolute;
   top: 2px;
   left: 2px;
@@ -62,6 +63,14 @@
 }
 .name-tag {
   position: relative;
+}
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 5px;
+  margin-top: 5px;
 }
 </style>
 <meta charset="utf-8"/>
@@ -217,10 +226,18 @@
     .courts { gap: 5px !important; }
   </style>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+
 function endCourtToPool(courtId) {
+  const namePoolEl = document.getElementById("namePool");
   Object.entries(tagRefs).forEach(([key, el]) => {
     if (el.parentElement.id === courtId) {
+      namePoolEl.appendChild(el);  // 실제 DOM 이동
       db.ref("nameTags/" + key).update({ court: "namePool" });
+      updateCount(el.textContent.split(" ")[0]);
+    }
+  });
+}
+);
       updateCount(el.textContent.split(" ")[0]);
     }
   });
@@ -460,7 +477,7 @@ document.getElementById("thCount").onclick = () => {
 <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
 </div>
 </div>
-</div>
+<div class="tag-container"></div></div>
 <div class="column" id="wait2">
 <div class="header" style="flex-direction: column; align-items: flex-start;">
 <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
@@ -475,16 +492,16 @@ document.getElementById("thCount").onclick = () => {
 <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
 </div>
 </div>
-</div>
+<div class="tag-container"></div></div>
 </div>
 <div class="layout">
 <div class="courts">
-<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-btn" onclick="endCourtToPool('court1')">종료</button></div></div>
-<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-btn" onclick="endCourtToPool('court2')">종료</button></div></div>
-<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-btn" onclick="endCourtToPool('court3')">종료</button></div></div>
-<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-btn" onclick="endCourtToPool('court4')">종료</button></div></div>
+<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-btn" onclick="endCourtToPool('court1')">종료</button></div><div class="tag-container"></div></div>
+<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-btn" onclick="endCourtToPool('court2')">종료</button></div><div class="tag-container"></div></div>
+<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-btn" onclick="endCourtToPool('court3')">종료</button></div><div class="tag-container"></div></div>
+<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-btn" onclick="endCourtToPool('court4')">종료</button></div><div class="tag-container"></div></div>
 </div>
-<div class="column" id="namePool"><div class="header"><h3>대기</h3></div></div>
+<div class="column" id="namePool"><div class="header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;"><h3>대기</h3><div style="display: flex; gap: 6px;"><button class="reset-btn" onclick="sortNamePoolByLevel()">급수 정렬</button><button class="reset-btn" onclick="sortNamePoolByCount()">횟수 정렬</button></div></div></div>
 </div>
 <script>
 function endCourtToPool(courtId) {
@@ -528,7 +545,15 @@ function createTag(key, data) {
   const tag = document.createElement("div");
   tag.className = "name-tag";
   tag.dataset.key = key;
-  tag.textContent = `${data.name} ${data.level}`.toUpperCase();
+  
+  const label = document.createElement("span");
+  label.textContent = `${data.name} ${data.level}`.toUpperCase();
+  tag.appendChild(label);
+  const badge = document.createElement("div");
+  badge.className = "count-badge";
+  badge.textContent = countMap[data.name] || 0;
+  tag.appendChild(badge);
+
   const badge = document.createElement("div");
   badge.className = "count-badge";
   badge.textContent = countMap[data.name] || 0;
@@ -604,7 +629,11 @@ db.ref("nameTags").on("child_added", snap => {
   const data = snap.val();
   const tag = createTag(key, data);
   tagRefs[key] = tag;
-  document.getElementById(data.court || "namePool").appendChild(tag);
+  
+        const target = document.getElementById(data.court || "namePool");
+        const tagArea = target.querySelector(".tag-container") || target;
+        tagArea.appendChild(tag);
+        
 });
 
 db.ref("nameTags").on("child_removed", snap => {
@@ -617,7 +646,11 @@ db.ref("nameTags").on("child_changed", snap => {
   const key = snap.key;
   const data = snap.val();
   const tag = tagRefs[key];
-  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
+  if (tag) 
+        const target = document.getElementById(data.court || "namePool");
+        const tagArea = target.querySelector(".tag-container") || target;
+        tagArea.appendChild(tag);
+        
 });
 
 window.onload = () => {
@@ -638,7 +671,7 @@ function updateCount(name) {
   if (!countMap[name]) countMap[name] = 0;
   countMap[name]++;
   Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.textContent.startsWith(name)) {
+    const label = el.querySelector('span'); if (label && label.textContent.startsWith(name)) {
       let badge = el.querySelector(".count-badge");
       if (!badge) {
         badge = document.createElement("div");
@@ -713,6 +746,28 @@ document.getElementById("thCount").onclick = () => {
   renderTable();
 };
 
+
+function sortNamePoolByLevel() {
+  const pool = document.getElementById("namePool").querySelector(".tag-container");
+  const tags = Array.from(pool.querySelectorAll(".name-tag"));
+  tags.sort((a, b) => {
+    const aLevel = parseInt(a.textContent.split(" ")[1]) || 0;
+    const bLevel = parseInt(b.textContent.split(" ")[1]) || 0;
+    return bLevel - aLevel;
+  });
+  tags.forEach(tag => pool.appendChild(tag));
+}
+
+function sortNamePoolByCount() {
+  const pool = document.getElementById("namePool").querySelector(".tag-container");
+  const tags = Array.from(pool.querySelectorAll(".name-tag"));
+  tags.sort((a, b) => {
+    const aCount = parseInt(a.querySelector(".count-badge")?.textContent) || 0;
+    const bCount = parseInt(b.querySelector(".count-badge")?.textContent) || 0;
+    return aCount - bCount;
+  });
+  tags.forEach(tag => pool.appendChild(tag));
+}
 </script>
 </body>
 </html>
