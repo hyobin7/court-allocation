@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="ko"><head><meta charset="utf-8"/><title>배드민턴 코트 배정</title><meta content="width=device-width, initial-scale=1" name="viewport"/><script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script><style>
 body { font-family: Arial; background: #f0f8ff; padding: 20px; }
 textarea { width: 100%; height: 80px; margin-bottom: 10px; }
@@ -9,8 +10,39 @@ textarea { width: 100%; height: 80px; margin-bottom: 10px; }
 .name-tag { padding: 6px; margin: 5px; background: #ddd; border-radius: 4px; display: inline-block; position: relative; font-weight: bold; }
 .male { background-color: #cce5ff; border: 1px solid #3399ff; }
 .female { background-color: #ffd6e8; border: 1px solid #ff66b2; }
-.badge { position: absolute; top: 2px; left: 4px; background-color: #800020; color: white; border-radius: 10px; padding: 2px 6px; font-size: 12px; }
+.badge { position: absolute; top: -6px; left: -6px; background-color: #800020; color: white; border-radius: 10px; padding: 2px 6px; font-size: 12px; }
 .flex { display: flex; gap: 10px; flex-wrap: wrap; }
+
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+    gap: 10px;
+}
+.courts {
+    flex: none;
+    width: 22%;
+    max-width: 22%;
+}
+#namePool {
+    flex: none;
+    width: 22%;
+    max-width: 22%;
+}
+#assignmentTable {
+    flex: none;
+    width: 50%;
+    max-width: 50%;
+}
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column !important;
+    }
+    .court, #namePool, #assignmentTable {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+}
 </style></head><body>
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
