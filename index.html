@@ -54,6 +54,23 @@
   cursor: pointer;
   font-weight: bold;
 }
+
+.count-badge {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  background-color: #800020;
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 2px 6px;
+  min-width: 20px;
+  text-align: center;
+}
+.name-tag {
+  position: relative;
+}
 </style>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -671,6 +688,21 @@ document.getElementById("thCount").onclick = () => {
 
 </script>
 <script>
+function endCourt(courtId) {
+  const court = document.getElementById(courtId);
+  const tags = court.querySelectorAll(".name-tag");
+  const namePoolContainer = document.querySelector("#namePool .tag-container");
+
+  tags.forEach(tag => {
+    const badge = tag.querySelector(".count-badge");
+    if (badge) {
+      let count = parseInt(badge.textContent || "0");
+      badge.textContent = count + 1;
+    }
+    namePoolContainer.appendChild(tag);
+  });
+}
+</script><script>
 function handleDragStart(e) {
   e.dataTransfer.setData("text/plain", e.target.outerHTML);
   e.dataTransfer.effectAllowed = "move";
@@ -727,45 +759,6 @@ function createNameTag() {
 
   document.querySelector("#namePool .tag-container").appendChild(tag);
   document.getElementById("nameInput").value = "";
-}
-
-// 정렬 기능
-function sortByLevel() {
-  const container = document.querySelector("#namePool .tag-container");
-  const tags = Array.from(container.children);
-  tags.sort((a, b) => {
-    const levelA = a.textContent.match(/[A-Z]/);
-    const levelB = b.textContent.match(/[A-Z]/);
-    return levelA < levelB ? -1 : 1;
-  });
-  tags.forEach(tag => container.appendChild(tag));
-}
-
-function sortByCount() {
-  const container = document.querySelector("#namePool .tag-container");
-  const tags = Array.from(container.children);
-  tags.sort((a, b) => {
-    const countA = parseInt(a.querySelector(".count-badge").textContent);
-    const countB = parseInt(b.querySelector(".count-badge").textContent);
-    return countA - countB;
-  });
-  tags.forEach(tag => container.appendChild(tag));
-}
-</script><script>
-function endCourt(courtId) {
-  const court = document.getElementById(courtId);
-  const tags = court.querySelectorAll(".name-tag");
-  const namePoolContainer = document.querySelector("#namePool .tag-container");
-
-  tags.forEach(tag => {
-    // 배치된 이름표를 namepool로 이동
-    const badge = tag.querySelector(".count-badge");
-    if (badge) {
-      let count = parseInt(badge.textContent || "0");
-      badge.textContent = count + 1;
-    }
-    namePoolContainer.appendChild(tag);
-  });
 }
 </script></body>
 </html>
