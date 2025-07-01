@@ -709,11 +709,13 @@ function handleDragStart(e) {
   e.target.classList.add("dragging");
 }
 
-document.getElementById("createTagBtn").addEventListener("click", createNameTag);
-document.getElementById("nameInput").addEventListener("keypress", function (e) {
-  if (e.key === "Enter") {
-    createNameTag();
-  }
+window.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("createTagBtn").addEventListener("click", createNameTag);
+  document.getElementById("nameInput").addEventListener("keypress", function (e) {
+    if (e.key === "Enter") {
+      createNameTag();
+    }
+  });
 });
 
 function createNameTag() {
@@ -735,7 +737,7 @@ function createNameTag() {
   tag.draggable = true;
   tag.addEventListener("dragstart", handleDragStart);
 
-  // 삭제: 우클릭 or 꾹 누르기
+  // 삭제 기능
   let pressTimer;
   tag.addEventListener("contextmenu", function (e) {
     e.preventDefault();
