@@ -224,56 +224,9 @@
  min-height: 80px !important; }
     .courts { gap: 5px !important; }
   </style>
-
-
-
-</head>
-<body><h2>배드민턴 코트 배정</h2>
-<textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
-<button class="btn" id="createTagBtn">이름표 만들기</button>
-<div class="waiting-extra" style="display: flex; gap: 10px; margin-bottom: 20px;">
-<div class="column" id="wait1">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 1</h3>
-<button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
-</div>
-</div>
-</div>
-<div class="column" id="wait2">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 2</h3>
-<button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
-</div>
-</div>
-</div>
-</div>
-<div class="layout" style="display: flex; flex-direction: row; gap: 10px;">
-<div class="courts">
-<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-button" onclick="endCourt('court1')">종료</button></div></div>
-<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-button" onclick="endCourt('court2')">종료</button></div></div>
-<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-button" onclick="endCourt('court3')">종료</button></div></div>
-<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-button" onclick="endCourt('court4')">종료</button></div></div>
-</div>
-<div class="column" id="namePool" style="flex-grow: 1; background: #fff; border: 2px solid #ccc; border-radius: 8px; padding: 10px; min-height: 300px; display: flex; flex-direction: column;"><div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 10px;"><div style="font-weight: bold; font-size: 16px;">대기</div><div id="sortBar" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 10px;"><button class="reset-button" onclick="sortByLevel()">급수 정렬</button><button class="reset-button" onclick="sortByCount()">횟수 정렬</button></div></div><div class="tag-container"></div></div>
-</div>
-
-
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+document.addEventListener('DOMContentLoaded', function() {
+
 let countMap = {};
 let sortKey = 'name';
 let sortAsc = true;
@@ -344,6 +297,8 @@ document.getElementById("thCount").onclick = () => {
   renderTable();
 };
 
+
+});
 </script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
 let countMap = {};
@@ -489,6 +444,50 @@ document.getElementById("thCount").onclick = () => {
 };
 
 </script>
+</head>
+<body><h2>배드민턴 코트 배정</h2>
+<textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
+<button class="btn" id="createTagBtn">이름표 만들기</button>
+<div class="waiting-extra" style="display: flex; gap: 10px; margin-bottom: 20px;">
+<div class="column" id="wait1">
+<div class="header" style="flex-direction: column; align-items: flex-start;">
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+<h3 style="margin: 0;">대기 1</h3>
+<button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
+</div>
+</div>
+</div>
+<div class="column" id="wait2">
+<div class="header" style="flex-direction: column; align-items: flex-start;">
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+<h3 style="margin: 0;">대기 2</h3>
+<button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
+</div>
+</div>
+</div>
+</div>
+<div class="layout" style="display: flex; flex-direction: row; gap: 10px;">
+<div class="courts">
+<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-button" onclick="endCourt('court1')">종료</button></div></div>
+<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-button" onclick="endCourt('court2')">종료</button></div></div>
+<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-button" onclick="endCourt('court3')">종료</button></div></div>
+<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-button" onclick="endCourt('court4')">종료</button></div></div>
+</div>
+<div class="column" id="namePool" style="flex-grow: 1; background: #fff; border: 2px solid #ccc; border-radius: 8px; padding: 10px; min-height: 300px; display: flex; flex-direction: column;"><div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 10px;"><div style="font-weight: bold; font-size: 16px;">대기</div><div id="sortBar" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 10px;"><button class="reset-button" onclick="sortByLevel()">급수 정렬</button><button class="reset-button" onclick="sortByCount()">횟수 정렬</button></div></div><div class="tag-container"></div></div>
+</div>
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
@@ -706,8 +705,7 @@ function endCourt(courtId) {
     namePoolContainer.appendChild(tag);
   });
 }
-</script>
-<script>
+</script><script>
 function handleDragStart(e) {
   e.dataTransfer.setData("text/plain", e.target.outerHTML);
   e.dataTransfer.effectAllowed = "move";
@@ -773,6 +771,5 @@ function createNameTag() {
   }
   input.value = "";
 }
-</script>
-</body>
+</script></body>
 </html>
