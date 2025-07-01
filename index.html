@@ -342,6 +342,7 @@ function moveAllToCourt(fromId, toId) {
 });
 
 db.ref("nameTags").on("child_added", snap => {
+  if (tagRefs[key]) return;  // 중복 방지
   const key = snap.key;
   const data = snap.val();
   const tag = createTag(key, data);
@@ -370,8 +371,7 @@ window.onload = () => {
       generateTags();
     }
   });
-};
-</script><script>
+};</script><script>
 function getBadge(tag) {
   let badge = tag.querySelector('.badge');
   if (!badge) {
@@ -505,12 +505,12 @@ function generateTags() {
 
 // Firebase child_added 확인 로그
 db.ref("nameTags").on("child_added", snap => {
+  if (tagRefs[key]) return;  // 중복 방지
   const key = snap.key;
   const data = snap.val();
   console.log("🟢 Firebase child_added:", key, data);
   const tag = createTag(key, data);
   tagRefs[key] = tag;
   document.getElementById(data.court || "namePool").appendChild(tag);
-});
-</script></body>
+});</script></body>
 </html>
