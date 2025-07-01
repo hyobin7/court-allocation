@@ -710,18 +710,24 @@ function handleDragStart(e) {
 }
 
 window.addEventListener("DOMContentLoaded", function () {
-  document.getElementById("createTagBtn").addEventListener("click", createNameTag);
-  document.getElementById("nameInput").addEventListener("keypress", function (e) {
-    if (e.key === "Enter") {
-      createNameTag();
-    }
-  });
+  const btn = document.getElementById("createTagBtn");
+  const input = document.getElementById("nameInput");
+  if (btn && input) {
+    btn.addEventListener("click", createNameTag);
+    input.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        createNameTag();
+      }
+    });
+  }
 });
 
 function createNameTag() {
-  const input = document.getElementById("nameInput").value.trim();
+  const input = document.getElementById("nameInput");
   if (!input) return;
-  const parts = input.split(/\s+/);
+  const value = input.value.trim();
+  if (!value) return;
+  const parts = value.split(/\s+/);
   if (parts.length !== 3) {
     alert("이름 급수 성별 순으로 입력해주세요. 예: 김영수 C 남");
     return;
@@ -730,23 +736,20 @@ function createNameTag() {
   const [name, level, gender] = parts;
   const tag = document.createElement("div");
   tag.className = "name-tag " + (gender === "남" ? "male" : "female");
-  tag.innerHTML = `
-    <div class="count-badge">0</div>
-    ${name} ${level}
-  `;
+  tag.innerHTML = '<div class="count-badge">0</div>' + name + " " + level;
   tag.draggable = true;
   tag.addEventListener("dragstart", handleDragStart);
 
-  // 삭제 기능
+  // 삭제
   let pressTimer;
   tag.addEventListener("contextmenu", function (e) {
     e.preventDefault();
     tag.remove();
   });
-  tag.addEventListener("touchstart", function (e) {
+  tag.addEventListener("touchstart", function () {
     pressTimer = setTimeout(() => tag.remove(), 800);
   });
-  tag.addEventListener("touchend", function (e) {
+  tag.addEventListener("touchend", function () {
     clearTimeout(pressTimer);
   });
 
@@ -759,8 +762,11 @@ function createNameTag() {
     }
   });
 
-  document.querySelector("#namePool .tag-container").appendChild(tag);
-  document.getElementById("nameInput").value = "";
+  const pool = document.querySelector("#namePool .tag-container");
+  if (pool) {
+    pool.appendChild(tag);
+  }
+  input.value = "";
 }
 </script></body>
 </html>
