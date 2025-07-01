@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 
 <html lang="ko">
-<head>
+<head><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <style>
     .main-container {
@@ -13,13 +13,13 @@
     }
     .courts {
         flex: none;
-        width: 22%;
-        max-width: 22%;
+        width: 72%;
+        max-width: 72%;
     }
     #namePool {
         flex: none;
-        width: 22%;
-        max-width: 22%;
+        width: 72%;
+        max-width: 72%;
     }
     #assignmentTable {
         flex: none;
@@ -45,7 +45,7 @@
         }
     }
     </style>
-<meta charset="utf-8">
+<meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>배드민턴 코트 배정</title>
 <style>
@@ -57,13 +57,13 @@
     }
     .courts {
         flex: none;
-        width: 22%;
-        max-width: 22%;
+        width: 72%;
+        max-width: 72%;
     }
     #namePool {
         flex: none;
-        width: 22%;
-        max-width: 22%;
+        width: 72%;
+        max-width: 72%;
     }
     #assignmentTable {
         flex: none;
@@ -197,223 +197,20 @@
  min-height: 80px !important; }
     .courts { gap: 5px !important; }
   </style>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
+  authDomain: "cock-5c32d.firebaseapp.com",
+  databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
+  projectId: "cock-5c32d",
+  storageBucket: "cock-5c32d.appspot.com",
+  messagingSenderId: "639370966543",
+  appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a"
 };
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
-</meta></head>
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const tagRefs = {};
+</script></head>
 <body>
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
@@ -451,65 +248,239 @@ document.getElementById("thCount").onclick = () => {
 </div>
 <div class="layout">
 <div class="courts">
-<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button></div></div>
-<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button></div></div>
-<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button></div></div>
-<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button></div></div>
+<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-btn" onclick="endCourt('court1')">종료</button></div></div>
+<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-btn" onclick="endCourt('court2')">종료</button></div></div>
+<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-btn" onclick="endCourt('court3')">종료</button></div></div>
+<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-btn" onclick="endCourt('court4')">종료</button></div></div>
 </div>
-<div class="column" id="namePool"><div class="header"><h3>대기</h3></div></div>
-<div class="column" id="statsTableContainer" style="min-width: 200px; background: #fff;">
-<table border="1" style="width: 100%; border-collapse: collapse; font-size: 14px;">
-<thead>
-<tr>
-<th id="thName" style="cursor:pointer;">이름 🔽</th>
-<th id="thCount" style="cursor:pointer;">횟수</th>
-</tr>
-</thead>
-<tbody id="statsTableBody"></tbody>
-</table>
-</div>
+<div class="column" id="namePool"><div class="header"><h3>대기</h3><div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;"><button class="reset-btn" onclick="sortByLevel()">급수정렬</button><button class="reset-btn" onclick="sortByCount()">횟수정렬</button></div></div></div>
 </div>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById("inputArea");
-  const button = document.getElementById("generateBtn");
-  const namePool = document.getElementById("namePool");
+function generateTags() {
+  const input = document.getElementById("inputArea").value.trim();
+  const lines = input.split("\n");
+  lines.forEach(line => {
+    const parts = line.trim().split(" ");
+    if (parts.length >= 3) {
+      const name = parts[0].toUpperCase();
+      const level = parts[1];
+      const gender = parts[2];
+      db.ref("nameTags").push({ name, level, gender, court: "namePool" });
+    }
+  });
+  document.getElementById("inputArea").value = "";
+}
 
-  function createNameTag(text) {
-    const tag = document.createElement("div");
-    tag.className = "name-tag";
-    tag.innerText = text;
-    namePool.appendChild(tag);
-  }
+function createTag(key, data) {
+  const tag = document.createElement("div");
+  tag.className = "name-tag";
+  tag.dataset.key = key;
+  tag.textContent = `${data.name} ${data.level}`.toUpperCase();
+  tag.classList.add(data.gender === "남" ? "male" : "female");
+  tag.addEventListener("contextmenu", e => {
+    e.preventDefault();
+    if (confirm("이 이름표를 삭제할까요?")) {
+      db.ref("nameTags/" + key).remove();
+    }
+  });
+  tag.addEventListener("touchend", function(e) {
+    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
+      tag.dataset.lastTouch = Date.now();
+    } else {
+      db.ref("nameTags/" + key).remove();
+      tag.dataset.lastTouch = 0;
+    }
+  });
+  return tag;
+}
 
-  function handleGenerate() {
-    const lines = input.value.trim().split("\n");
-    lines.forEach(line => {
-      const trimmed = line.trim();
-      if (trimmed) createNameTag(trimmed);
-    });
-    input.value = "";
-  }
+function resetCourt(courtId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === courtId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
 
-  button.addEventListener("click", handleGenerate);
-  input.addEventListener("keypress", function(e) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleGenerate();
+function resetToWait(waitId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === waitId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
+
+function moveAllToCourt(fromId, toId) {
+  const fromEl = document.getElementById(fromId);
+  const toEl = document.getElementById(toId);
+  const tags = fromEl.querySelectorAll('.name-tag');
+  let countInCourt = toEl.querySelectorAll('.name-tag').length;
+  tags.forEach(tag => {
+    if (countInCourt < 4) {
+      toEl.appendChild(tag);
+      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
+      countInCourt++;
+    }
+  });
+}
+
+["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
+  new Sortable(document.getElementById(id), {
+    group: "shared",
+    animation: 150,
+    onAdd: function(evt) {
+      if (evt.to.querySelectorAll('.name-tag').length > 4) {
+        evt.from.appendChild(evt.item);
+        alert("각 칸에는 최대 4명까지만 배정할 수 있습니다.");
+        return;
+      }
+      const court = evt.to.id;
+      const key = evt.item.dataset.key;
+      db.ref("nameTags/" + key).update({ court });
     }
   });
 });
-</script>
 
-<style>
-  .name-tag {
-    padding: 6px 12px;
-    background-color: #6c757d;
-    color: white;
-    border-radius: 4px;
-    display: inline-block;
-    margin: 4px;
+db.ref("nameTags").on("child_added", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  const tag = createTag(key, data);
+  tagRefs[key] = tag;
+  document.getElementById(data.court || "namePool").appendChild(tag);
+});
+
+db.ref("nameTags").on("child_removed", snap => {
+  const tag = tagRefs[snap.key];
+  if (tag) tag.remove();
+  delete tagRefs[snap.key];
+});
+
+db.ref("nameTags").on("child_changed", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  const tag = tagRefs[key];
+  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
+});
+
+window.onload = () => {
+  document.getElementById("generateBtn").onclick = generateTags;
+  document.getElementById("inputArea").addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      generateTags();
+    }
+  });
+};
+</script><script>
+function getBadge(tag) {
+  let badge = tag.querySelector('.badge');
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.textContent = '0';
+    badge.ondblclick = function () {
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.value = badge.textContent;
+      input.style.width = '40px';
+      badge.textContent = '';
+      badge.appendChild(input);
+      input.focus();
+      input.onblur = () => {
+        badge.textContent = input.value || '0';
+      };
+      input.onkeydown = (e) => {
+        if (e.key === 'Enter') input.blur();
+      };
+    };
+    tag.insertBefore(badge, tag.firstChild);
   }
-</style>
-<script></script></body>
+  return badge;
+}
+
+function endCourt(courtId) {
+  const court = document.getElementById(courtId);
+  const namePool = document.getElementById('namePool');
+  const tags = court.querySelectorAll('.name-tag');
+  tags.forEach(tag => {
+    namePool.appendChild(tag);
+    const badge = getBadge(tag);
+    badge.textContent = String(parseInt(badge.textContent || '0') + 1);
+    db.ref("nameTags/" + tag.dataset.key).update({ court: "namePool" });
+  });
+}
+
+function sortDefault() {
+  const namePool = document.getElementById('namePool');
+  const tags = [...namePool.querySelectorAll('.name-tag')];
+  tags.forEach(tag => namePool.appendChild(tag)); // restore original order
+}
+
+function sortByLevel() {
+  const namePool = document.getElementById('namePool');
+  const tags = [...namePool.querySelectorAll('.name-tag')];
+  tags.sort((a, b) => {
+    const aLevel = a.textContent.split(' ')[1];
+    const bLevel = b.textContent.split(' ')[1];
+    return aLevel.localeCompare(bLevel);
+  });
+  tags.forEach(tag => namePool.appendChild(tag));
+}
+
+function sortByCount() {
+  const namePool = document.getElementById('namePool');
+  const tags = [...namePool.querySelectorAll('.name-tag')];
+  tags.sort((a, b) => {
+    const aCount = parseInt(getBadge(a).textContent || '0');
+    const bCount = parseInt(getBadge(b).textContent || '0');
+    return bCount - aCount;
+  });
+  tags.forEach(tag => namePool.appendChild(tag));
+}
+
+// adjust badge UI styling
+const style = document.createElement("style");
+style.textContent = `
+.badge {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  background-color: #800020;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.name-tag {
+  position: relative;
+}
+`;
+document.head.appendChild(style);
+</script><script>
+function generateTags() {
+  const input = document.getElementById("inputArea").value.trim();
+  const lines = input.split("\n");
+  lines.forEach(line => {
+    const parts = line.trim().split(" ");
+    if (parts.length >= 3) {
+      const name = parts[0].toUpperCase();
+      const level = parts[1];
+      const gender = parts[2];
+      db.ref("nameTags").push({ name, level, gender, court: "namePool" });
+    }
+  });
+  document.getElementById("inputArea").value = "";
+}
+
+window.onload = () => {
+  document.getElementById("generateBtn").onclick = generateTags;
+  document.getElementById("inputArea").addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      generateTags();
+    }
+  });
+};
+</script></body>
 </html>
