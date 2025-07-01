@@ -342,8 +342,8 @@ function moveAllToCourt(fromId, toId) {
 });
 
 db.ref("nameTags").on("child_added", snap => {
-  if (tagRefs[key]) return;  // 중복 방지
   const key = snap.key;
+  if (tagRefs[key]) return;  // prevent duplicate rendering
   const data = snap.val();
   const tag = createTag(key, data);
   tagRefs[key] = tag;
@@ -482,35 +482,5 @@ window.onload = () => {
     }
   });
 };
-</script><script>
-// 디버깅용 로그 추가
-function generateTags() {
-  const input = document.getElementById("inputArea").value.trim();
-  const lines = input.split("\n");
-  lines.forEach(line => {
-    const parts = line.trim().split(" ");
-    if (parts.length >= 3) {
-      const name = parts[0].toUpperCase();
-      const level = parts[1];
-      const gender = parts[2];
-      const newTag = { name, level, gender, court: "namePool" };
-      console.log("🔥 이름표 Firebase로 push 시도:", newTag);
-      db.ref("nameTags").push(newTag)
-        .then(() => console.log("✅ push 성공"))
-        .catch((error) => console.error("❌ push 실패:", error));
-    }
-  });
-  document.getElementById("inputArea").value = "";
-}
-
-// Firebase child_added 확인 로그
-db.ref("nameTags").on("child_added", snap => {
-  if (tagRefs[key]) return;  // 중복 방지
-  const key = snap.key;
-  const data = snap.val();
-  console.log("🟢 Firebase child_added:", key, data);
-  const tag = createTag(key, data);
-  tagRefs[key] = tag;
-  document.getElementById(data.court || "namePool").appendChild(tag);
-});</script></body>
+</script></body>
 </html>
