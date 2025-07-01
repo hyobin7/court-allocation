@@ -513,9 +513,21 @@ function createNameTag() {
   `;
   tag.draggable = true;
   tag.addEventListener("dragstart", handleDragStart);
-  tag.addEventListener("dblclick", function () {
+  
+  let pressTimer;
+  tag.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
     tag.remove();
   });
+  tag.addEventListener("touchstart", function (e) {
+    pressTimer = setTimeout(function () {
+      tag.remove();
+    }, 800);
+  });
+  tag.addEventListener("touchend", function (e) {
+    clearTimeout(pressTimer);
+  });
+
 
   document.querySelector("#namePool .tag-container").appendChild(tag);
   document.getElementById("nameInput").value = "";
