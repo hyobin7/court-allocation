@@ -47,24 +47,46 @@
     
 .badge {
   position: absolute;
-  top: -8px;
-  left: -8px;
+  top: -6px;
+  left: -6px;
   background-color: #800020;
   color: white;
   font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
   width: 18px;
   height: 18px;
-  text-align: center;
-  line-height: 18px;
-  border-radius: 50%;
-  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
 }
 .name-tag {
   position: relative;
 }
+.sort-btns {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.sort-btns button {
+  background-color: #ff6666;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#namePool {
+  flex-grow: 1;
+  width: auto !important;
+  max-width: 100% !important;
+}
 </style>
 <meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>배드민턴 코트 배정</title>
 <style>
     .main-container {
@@ -431,7 +453,7 @@ document.getElementById("thCount").onclick = () => {
 };
 
 </script>
-</head>
+</meta></head>
 <body>
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
@@ -469,12 +491,12 @@ document.getElementById("thCount").onclick = () => {
 </div>
 <div class="layout">
 <div class="courts">
-<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button></div></div>
-<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button></div></div>
-<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button></div></div>
-<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button></div></div>
+<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-btn" onclick="endCourt('court1')">종료</button></div></div>
+<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-btn" onclick="endCourt('court2')">종료</button></div></div>
+<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-btn" onclick="endCourt('court3')">종료</button></div></div>
+<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-btn" onclick="endCourt('court4')">종료</button></div></div>
 </div>
-<div class="column" id="namePool"><div class="header"><h3>대기</h3></div></div>
+<div class="column" id="namePool"><div class="sort-btns"><button onclick="sortNamePool('대기')">대기</button><button onclick="sortNamePool('급수정렬')">급수정렬</button><button onclick="sortNamePool('횟수정렬')">횟수정렬</button></div><div class="header"><h3>대기</h3></div></div>
 <div class="column" id="statsTableContainer" style="min-width: 200px; background: #fff;">
 <table border="1" style="width: 100%; border-collapse: collapse; font-size: 14px;">
 <thead>
@@ -688,148 +710,56 @@ document.getElementById("thCount").onclick = () => {
   renderTable();
 };
 
-</script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  const firebaseConfig = {
-    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
-    authDomain: "cock-5c32d.firebaseapp.com",
-    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
-    projectId: "cock-5c32d",
-    storageBucket: "cock-5c32d.appspot.com",
-    messagingSenderId: "639370966543",
-    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-  const tagRefs = {};
-
-  function createTag(key, data) {
-    if (tagRefs[key]) return;
-    const tag = document.createElement("div");
-    tag.className = "name-tag";
-    tag.dataset.key = key;
-    tag.textContent = data.name + " " + data.level;
-    tag.classList.add(data.gender === "남" ? "male" : "female");
-
-    const badge = document.createElement("span");
-    badge.className = "badge";
-    badge.textContent = "0";
-    badge.ondblclick = function () {
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = badge.textContent;
-      badge.innerHTML = "";
-      badge.appendChild(input);
-      input.focus();
-      input.onblur = () => badge.textContent = input.value || "0";
-    };
-    tag.insertBefore(badge, tag.firstChild);
-
-    tag.addEventListener("contextmenu", e => {
-      e.preventDefault();
-      if (confirm("이 이름표를 삭제할까요?")) db.ref("nameTags/" + key).remove();
-    });
-    tag.addEventListener("touchend", function(e) {
-      if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
-        tag.dataset.lastTouch = Date.now();
-      } else {
-        db.ref("nameTags/" + key).remove();
-        tag.dataset.lastTouch = 0;
-      }
-    });
-
-    tagRefs[key] = tag;
-    return tag;
-  }
-
-  function generateTags() {
-    const input = document.getElementById("inputArea").value.trim();
-    const lines = input.split("\n");
-    lines.forEach(line => {
-      const [gender, name, level] = line.trim().split(" ");
-      if (gender && name && level) {
-        db.ref("nameTags").push({ gender, name, level, court: "namePool" });
-      }
-    });
-    document.getElementById("inputArea").value = "";
-  }
-
-  document.getElementById("generateBtn").onclick = generateTags;
-  document.getElementById("inputArea").addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      generateTags();
+</script><script>
+function sortNamePool(type) {
+  const pool = document.getElementById("namePool");
+  const tags = Array.from(pool.querySelectorAll(".name-tag"));
+  tags.sort((a, b) => {
+    if (type === "급수정렬") return a.textContent.localeCompare(b.textContent);
+    if (type === "횟수정렬") {
+      const aCount = parseInt(a.querySelector(".badge")?.textContent || 0);
+      const bCount = parseInt(b.querySelector(".badge")?.textContent || 0);
+      return bCount - aCount;
     }
+    return 0;
   });
+  tags.forEach(tag => pool.appendChild(tag));
+}
 
-  db.ref("nameTags").on("child_added", snap => {
-    const key = snap.key, data = snap.val();
-    const tag = createTag(key, data);
-    if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
+function endCourt(courtId) {
+  const court = document.getElementById(courtId);
+  const tags = court.querySelectorAll('.name-tag');
+  tags.forEach(tag => {
+    const badge = tag.querySelector(".badge");
+    if (badge) badge.textContent = parseInt(badge.textContent) + 1;
+    else {
+      const newBadge = document.createElement("div");
+      newBadge.className = "badge";
+      newBadge.textContent = "1";
+      newBadge.ondblclick = () => editBadge(newBadge);
+      tag.appendChild(newBadge);
+    }
+    document.getElementById("namePool").appendChild(tag);
   });
-  db.ref("nameTags").on("child_removed", snap => {
-    const tag = tagRefs[snap.key];
-    if (tag) tag.remove();
-    delete tagRefs[snap.key];
-  });
-  db.ref("nameTags").on("child_changed", snap => {
-    const tag = tagRefs[snap.key];
-    const data = snap.val();
-    if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
-  });
+}
 
-  window.resetToWait = function(id) {
-    Object.entries(tagRefs).forEach(([key, el]) => {
-      if (el.parentElement.id === id) db.ref("nameTags/" + key).update({ court: "namePool" });
-    });
+function editBadge(badgeEl) {
+  const oldValue = badgeEl.textContent;
+  const input = document.createElement("input");
+  input.type = "number";
+  input.value = oldValue;
+  input.style.width = "20px";
+  badgeEl.textContent = "";
+  badgeEl.appendChild(input);
+  input.focus();
+  const save = () => {
+    const val = parseInt(input.value, 10);
+    if (!isNaN(val)) badgeEl.textContent = val;
+    else badgeEl.textContent = oldValue;
   };
-  window.resetCourt = window.resetToWait;
-  window.moveAllToCourt = function(from, to) {
-    const tags = document.getElementById(from).querySelectorAll(".name-tag");
-    let count = document.getElementById(to).querySelectorAll(".name-tag").length;
-    tags.forEach(tag => {
-      if (["court1","court2","court3","court4"].includes(to) && count >= 4) return;
-      db.ref("nameTags/" + tag.dataset.key).update({ court: to });
-      count++;
-    });
-  };
-  window.endCourt = function(courtId) {
-    const tags = document.getElementById(courtId).querySelectorAll(".name-tag");
-    tags.forEach(tag => {
-      db.ref("nameTags/" + tag.dataset.key).update({ court: "namePool" });
-      const badge = tag.querySelector(".badge");
-      badge.textContent = parseInt(badge.textContent || "0") + 1;
-    });
-  };
-  window.sortByLevel = function() {
-    const tags = [...document.getElementById("namePool").querySelectorAll(".name-tag")];
-    tags.sort((a, b) => a.textContent.split(" ")[1].localeCompare(b.textContent.split(" ")[1]));
-    tags.forEach(tag => document.getElementById("namePool").appendChild(tag));
-  };
-  window.sortByCount = function() {
-    const tags = [...document.getElementById("namePool").querySelectorAll(".name-tag")];
-    tags.sort((a, b) => parseInt(b.querySelector(".badge").textContent || 0) - parseInt(a.querySelector(".badge").textContent || 0));
-    tags.forEach(tag => document.getElementById("namePool").appendChild(tag));
-  };
-
-  ["wait1", "wait2", "namePool", "court1", "court2", "court3", "court4"].forEach(id => {
-    new Sortable(document.getElementById(id), {
-      group: "shared",
-      animation: 150,
-      onAdd: evt => {
-        const tag = evt.item;
-        const court = evt.to.id;
-        if (["court1","court2","court3","court4","wait1","wait2"].includes(court) &&
-            evt.to.querySelectorAll(".name-tag").length > 4) {
-          evt.from.appendChild(tag);
-          alert("각 칸에는 최대 4명까지 가능합니다.");
-          return;
-        }
-        db.ref("nameTags/" + tag.dataset.key).update({ court });
-      }
-    });
-  });
-});
-</script></body>
+  input.onblur = save;
+  input.onkeydown = (e) => { if (e.key === "Enter") save(); };
+}
+</script>
+</body>
 </html>
