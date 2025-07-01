@@ -229,7 +229,8 @@
 
 </head>
 <body><h2>배드민턴 코트 배정</h2>
-<textarea id="nameInput" placeholder="이름 급수 성별" style="width:100%; height:80px; font-size:16px; margin-bottom:10px;"></textarea><button class="btn" id="createTagBtn">이름표 만들기</button>
+<textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
+<button class="btn" id="createTagBtn">이름표 만들기</button>
 <div class="waiting-extra" style="display: flex; gap: 10px; margin-bottom: 20px;">
 <div class="column" id="wait1">
 <div class="header" style="flex-direction: column; align-items: flex-start;">
@@ -272,93 +273,506 @@
 </div>
 
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+let countMap = {};
+let sortKey = 'name';
+let sortAsc = true;
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const input = document.getElementById("nameInput");
-  const createBtn = document.getElementById("createTagBtn");
-  const namePool = document.getElementById("namePool");
-  const countMap = {};
+function updateCount(name) {
+  if (!countMap[name]) countMap[name] = 0;
+  countMap[name]++;
+  renderTable();
+}
 
-  function createNameTag(name, level, gender) {
-    const tag = document.createElement("div");
-    tag.className = "name-tag " + (gender === "남" ? "male" : "female");
-    tag.setAttribute("draggable", true);
+function renderTable() {
+  const tableBody = document.getElementById("statsTableBody");
+  tableBody.innerHTML = "";
 
-    if (!countMap[name]) countMap[name] = 0;
-
-    const badge = document.createElement("div");
-    badge.className = "count-badge";
-    badge.textContent = countMap[name];
-
-    badge.ondblclick = () => {
-      const newVal = prompt("숫자를 수정하세요:", badge.textContent);
-      if (!isNaN(newVal)) badge.textContent = parseInt(newVal);
-    };
-
-    tag.appendChild(badge);
-    tag.appendChild(document.createTextNode(" " + name + " " + level));
-
-    tag.addEventListener("contextmenu", e => {
-      e.preventDefault();
-      tag.remove();
-    });
-
-    let pressTimer;
-    tag.addEventListener("touchstart", () => {
-      pressTimer = setTimeout(() => tag.remove(), 800);
-    });
-    tag.addEventListener("touchend", () => clearTimeout(pressTimer));
-
-    namePool.appendChild(tag);
-  }
-
-  function addTag() {
-    const val = input.value.trim();
-    const [name, level, gender] = val.split(" ");
-    if (!name || !level || !gender) return;
-
-    createNameTag(name, level, gender);
-    input.value = "";
-  }
-
-  createBtn?.addEventListener("click", addTag);
-  input?.addEventListener("keypress", (e) => {
-    if (e.key === "Enter") addTag();
+  const entries = Object.entries(countMap);
+  entries.sort((a, b) => {
+    if (sortKey === 'name') {
+      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
+    } else {
+      return sortAsc ? a[1] - b[1] : b[1] - a[1];
+    }
   });
 
-  window.sortByLevel = () => {
-    const tags = Array.from(namePool.querySelectorAll(".name-tag"));
-    tags.sort((a, b) => {
-      const levelA = a.textContent.split(" ")[1];
-      const levelB = b.textContent.split(" ")[1];
-      return levelA.localeCompare(levelB);
-    });
-    tags.forEach(tag => namePool.appendChild(tag));
-  };
+  for (const [name, count] of entries) {
+    const row = document.createElement("tr");
+    const tdName = document.createElement("td");
+    tdName.textContent = name;
+    const tdCount = document.createElement("td");
+    tdCount.textContent = count;
+    tdCount.ondblclick = function () {
+      const oldValue = count;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.value = oldValue;
+      input.style.width = "60px";
+      this.innerHTML = "";
+      this.appendChild(input);
+      input.focus();
+      const save = () => {
+        const newVal = parseInt(input.value, 10);
+        if (!isNaN(newVal)) {
+          countMap[name] = newVal;
+          renderTable();
+        } else {
+          input.value = oldValue;
+          renderTable();
+        }
+      };
+      input.onblur = save;
+      input.onkeydown = (e) => {
+        if (e.key === "Enter") save();
+      };
+    };
+    row.appendChild(tdName);
+    row.appendChild(tdCount);
+    tableBody.appendChild(row);
+  }
+}
 
-  window.sortByCount = () => {
-    const tags = Array.from(namePool.querySelectorAll(".name-tag"));
-    tags.sort((a, b) => {
-      const countA = parseInt(a.querySelector(".count-badge")?.textContent || "0");
-      const countB = parseInt(b.querySelector(".count-badge")?.textContent || "0");
-      return countA - countB;
-    });
-    tags.forEach(tag => namePool.appendChild(tag));
-  };
+document.getElementById("thName").onclick = () => {
+  sortKey = "name";
+  sortAsc = !sortAsc;
+  renderTable();
+};
+document.getElementById("thCount").onclick = () => {
+  sortKey = "count";
+  sortAsc = !sortAsc;
+  renderTable();
+};
 
-  document.querySelectorAll(".end-button").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const court = btn.closest(".column");
-      const tags = court.querySelectorAll(".name-tag");
-      tags.forEach(tag => {
-        const name = tag.textContent.trim().split(" ")[0];
-        const badge = tag.querySelector(".count-badge");
-        if (badge) badge.textContent = parseInt(badge.textContent) + 1;
-        namePool.appendChild(tag);
-      });
-    });
+</script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
+let countMap = {};
+let sortKey = 'name';
+let sortAsc = true;
+
+function updateCount(name) {
+  if (!countMap[name]) countMap[name] = 0;
+  countMap[name]++;
+  renderTable();
+}
+
+function renderTable() {
+  const tableBody = document.getElementById("statsTableBody");
+  tableBody.innerHTML = "";
+
+  const entries = Object.entries(countMap);
+  entries.sort((a, b) => {
+    if (sortKey === 'name') {
+      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
+    } else {
+      return sortAsc ? a[1] - b[1] : b[1] - a[1];
+    }
+  });
+
+  for (const [name, count] of entries) {
+    const row = document.createElement("tr");
+    const tdName = document.createElement("td");
+    tdName.textContent = name;
+    const tdCount = document.createElement("td");
+    tdCount.textContent = count;
+    tdCount.ondblclick = function () {
+      const oldValue = count;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.value = oldValue;
+      input.style.width = "60px";
+      this.innerHTML = "";
+      this.appendChild(input);
+      input.focus();
+      const save = () => {
+        const newVal = parseInt(input.value, 10);
+        if (!isNaN(newVal)) {
+          countMap[name] = newVal;
+          renderTable();
+        } else {
+          input.value = oldValue;
+          renderTable();
+        }
+      };
+      input.onblur = save;
+      input.onkeydown = (e) => {
+        if (e.key === "Enter") save();
+      };
+    };
+    row.appendChild(tdName);
+    row.appendChild(tdCount);
+    tableBody.appendChild(row);
+  }
+}
+
+document.getElementById("thName").onclick = () => {
+  sortKey = "name";
+  sortAsc = !sortAsc;
+  renderTable();
+};
+document.getElementById("thCount").onclick = () => {
+  sortKey = "count";
+  sortAsc = !sortAsc;
+  renderTable();
+};
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
+let countMap = {};
+let sortKey = 'name';
+let sortAsc = true;
+
+function updateCount(name) {
+  if (!countMap[name]) countMap[name] = 0;
+  countMap[name]++;
+  renderTable();
+}
+
+function renderTable() {
+  const tableBody = document.getElementById("statsTableBody");
+  tableBody.innerHTML = "";
+
+  const entries = Object.entries(countMap);
+  entries.sort((a, b) => {
+    if (sortKey === 'name') {
+      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
+    } else {
+      return sortAsc ? a[1] - b[1] : b[1] - a[1];
+    }
+  });
+
+  for (const [name, count] of entries) {
+    const row = document.createElement("tr");
+    const tdName = document.createElement("td");
+    tdName.textContent = name;
+    const tdCount = document.createElement("td");
+    tdCount.textContent = count;
+    tdCount.ondblclick = function () {
+      const oldValue = count;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.value = oldValue;
+      input.style.width = "60px";
+      this.innerHTML = "";
+      this.appendChild(input);
+      input.focus();
+      const save = () => {
+        const newVal = parseInt(input.value, 10);
+        if (!isNaN(newVal)) {
+          countMap[name] = newVal;
+          renderTable();
+        } else {
+          input.value = oldValue;
+          renderTable();
+        }
+      };
+      input.onblur = save;
+      input.onkeydown = (e) => {
+        if (e.key === "Enter") save();
+      };
+    };
+    row.appendChild(tdName);
+    row.appendChild(tdCount);
+    tableBody.appendChild(row);
+  }
+}
+
+document.getElementById("thName").onclick = () => {
+  sortKey = "name";
+  sortAsc = !sortAsc;
+  renderTable();
+};
+document.getElementById("thCount").onclick = () => {
+  sortKey = "count";
+  sortAsc = !sortAsc;
+  renderTable();
+};
+
+</script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
+  authDomain: "cock-5c32d.firebaseapp.com",
+  databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
+  projectId: "cock-5c32d",
+  storageBucket: "cock-5c32d.appspot.com",
+  messagingSenderId: "639370966543",
+  appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const tagRefs = {};
+
+function generateTags() {
+  const input = document.getElementById("inputArea").value.trim();
+  const lines = input.split("\n");
+  lines.forEach(line => {
+    const parts = line.trim().split(" ");
+    if (parts.length >= 3) {
+      const name = parts[0].toUpperCase();
+      const level = parts[1];
+      const gender = parts[2];
+      db.ref("nameTags").push({ name, level, gender, court: "namePool" });
+    }
+  });
+  document.getElementById("inputArea").value = "";
+}
+
+function createTag(key, data) {
+  const tag = document.createElement("div");
+  tag.className = "name-tag";
+  tag.dataset.key = key;
+  tag.textContent = `${data.name} ${data.level}`.toUpperCase();
+  tag.classList.add(data.gender === "남" ? "male" : "female");
+  tag.addEventListener("contextmenu", e => {
+    e.preventDefault();
+    if (confirm("이 이름표를 삭제할까요?")) {
+      db.ref("nameTags/" + key).remove();
+    }
+  });
+  tag.addEventListener("touchend", function(e) {
+    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
+      tag.dataset.lastTouch = Date.now();
+    } else {
+      db.ref("nameTags/" + key).remove();
+      tag.dataset.lastTouch = 0;
+    }
+  });
+  return tag;
+}
+
+function resetCourt(courtId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === courtId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
+
+function resetToWait(waitId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === waitId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
+
+function moveAllToCourt(fromId, toId) {
+  const fromEl = document.getElementById(fromId);
+  const toEl = document.getElementById(toId);
+  const tags = fromEl.querySelectorAll('.name-tag');
+  let countInCourt = toEl.querySelectorAll('.name-tag').length;
+  tags.forEach(tag => {
+    if (countInCourt < 4) {
+      toEl.appendChild(tag);
+      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
+      countInCourt++;
+    }
+  });
+}
+
+["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
+  new Sortable(document.getElementById(id), {
+    group: "shared",
+    animation: 150,
+    onAdd: function(evt) {
+      if (evt.to.querySelectorAll('.name-tag').length > 4) {
+        evt.from.appendChild(evt.item);
+        alert("각 칸에는 최대 4명까지만 배정할 수 있습니다.");
+        return;
+      }
+      const court = evt.to.id;
+      const key = evt.item.dataset.key;
+      db.ref("nameTags/" + key).update({ court });
+      if (["court1","court2","court3","court4"].includes(court)) updateCount(evt.item.textContent.split(" ")[0]);
+    }
   });
 });
-</script></body>
+
+db.ref("nameTags").on("child_added", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  const tag = createTag(key, data);
+  tagRefs[key] = tag;
+  document.getElementById(data.court || "namePool").appendChild(tag);
+});
+
+db.ref("nameTags").on("child_removed", snap => {
+  const tag = tagRefs[snap.key];
+  if (tag) tag.remove();
+  delete tagRefs[snap.key];
+});
+
+db.ref("nameTags").on("child_changed", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  const tag = tagRefs[key];
+  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
+});
+
+window.onload = () => {
+  document.getElementById("generateBtn").onclick = generateTags;
+  document.getElementById("inputArea").addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      generateTags();
+    }
+  });
+};
+
+let countMap = {};
+let sortKey = 'name';
+let sortAsc = true;
+
+function updateCount(name) {
+  if (!countMap[name]) countMap[name] = 0;
+  countMap[name]++;
+  renderTable();
+}
+
+function renderTable() {
+  const tableBody = document.getElementById("statsTableBody");
+  tableBody.innerHTML = "";
+
+  const entries = Object.entries(countMap);
+  entries.sort((a, b) => {
+    if (sortKey === 'name') {
+      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
+    } else {
+      return sortAsc ? a[1] - b[1] : b[1] - a[1];
+    }
+  });
+
+  for (const [name, count] of entries) {
+    const row = document.createElement("tr");
+    const tdName = document.createElement("td");
+    tdName.textContent = name;
+    const tdCount = document.createElement("td");
+    tdCount.textContent = count;
+    tdCount.ondblclick = function () {
+      const oldValue = count;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.value = oldValue;
+      input.style.width = "60px";
+      this.innerHTML = "";
+      this.appendChild(input);
+      input.focus();
+      const save = () => {
+        const newVal = parseInt(input.value, 10);
+        if (!isNaN(newVal)) {
+          countMap[name] = newVal;
+          renderTable();
+        } else {
+          input.value = oldValue;
+          renderTable();
+        }
+      };
+      input.onblur = save;
+      input.onkeydown = (e) => {
+        if (e.key === "Enter") save();
+      };
+    };
+    row.appendChild(tdName);
+    row.appendChild(tdCount);
+    tableBody.appendChild(row);
+  }
+}
+
+document.getElementById("thName").onclick = () => {
+  sortKey = "name";
+  sortAsc = !sortAsc;
+  renderTable();
+};
+document.getElementById("thCount").onclick = () => {
+  sortKey = "count";
+  sortAsc = !sortAsc;
+  renderTable();
+};
+
+</script>
+<script>
+function endCourt(courtId) {
+  const court = document.getElementById(courtId);
+  const tags = court.querySelectorAll(".name-tag");
+  const namePoolContainer = document.querySelector("#namePool .tag-container");
+
+  tags.forEach(tag => {
+    const badge = tag.querySelector(".count-badge");
+    if (badge) {
+      let count = parseInt(badge.textContent || "0");
+      badge.textContent = count + 1;
+    }
+    namePoolContainer.appendChild(tag);
+  });
+}
+</script>
+<script>
+function handleDragStart(e) {
+  e.dataTransfer.setData("text/plain", e.target.outerHTML);
+  e.dataTransfer.effectAllowed = "move";
+  e.target.classList.add("dragging");
+}
+
+window.addEventListener("DOMContentLoaded", function () {
+  const btn = document.getElementById("createTagBtn");
+  const input = document.getElementById("nameInput");
+  if (btn && input) {
+    btn.addEventListener("click", createNameTag);
+    input.addEventListener("keypress", function (e) {
+      if (e.key === "Enter") {
+        createNameTag();
+      }
+    });
+  }
+});
+
+function createNameTag() {
+  const input = document.getElementById("nameInput");
+  if (!input) return;
+  const value = input.value.trim();
+  if (!value) return;
+  const parts = value.split(/\s+/);
+  if (parts.length !== 3) {
+    alert("이름 급수 성별 순으로 입력해주세요. 예: 김영수 C 남");
+    return;
+  }
+
+  const [name, level, gender] = parts;
+  const tag = document.createElement("div");
+  tag.className = "name-tag " + (gender === "남" ? "male" : "female");
+  tag.innerHTML = '<div class="count-badge">0</div>' + name + " " + level;
+  tag.draggable = true;
+  tag.addEventListener("dragstart", handleDragStart);
+
+  // 삭제
+  let pressTimer;
+  tag.addEventListener("contextmenu", function (e) {
+    e.preventDefault();
+    tag.remove();
+  });
+  tag.addEventListener("touchstart", function () {
+    pressTimer = setTimeout(() => tag.remove(), 800);
+  });
+  tag.addEventListener("touchend", function () {
+    clearTimeout(pressTimer);
+  });
+
+  // 숫자 배지 수정
+  const badge = tag.querySelector(".count-badge");
+  badge.addEventListener("dblclick", function () {
+    const newCount = prompt("숫자를 입력하세요:", badge.textContent);
+    if (newCount !== null && !isNaN(newCount)) {
+      badge.textContent = parseInt(newCount);
+    }
+  });
+
+  const pool = document.querySelector("#namePool .tag-container");
+  if (pool) {
+    pool.appendChild(tag);
+  }
+  input.value = "";
+}
+</script>
+</body>
 </html>
