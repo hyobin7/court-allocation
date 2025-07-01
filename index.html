@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 
 <html lang="ko">
-<head><script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<head>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <style>
     .main-container {
@@ -197,20 +197,7 @@
  min-height: 80px !important; }
     .courts { gap: 5px !important; }
   </style>
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
-  authDomain: "cock-5c32d.firebaseapp.com",
-  databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
-  projectId: "cock-5c32d",
-  storageBucket: "cock-5c32d.appspot.com",
-  messagingSenderId: "639370966543",
-  appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const tagRefs = {};
-</script></head>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script></head>
 <body>
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
@@ -256,27 +243,27 @@ const tagRefs = {};
 <div class="column" id="namePool"><div class="header"><h3>대기</h3><div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;"><button class="reset-btn" onclick="sortByLevel()">급수정렬</button><button class="reset-btn" onclick="sortByCount()">횟수정렬</button></div></div></div>
 </div>
 <script>
-function generateTags() {
-  const input = document.getElementById("inputArea").value.trim();
-  const lines = input.split("\n");
-  lines.forEach(line => {
-    const parts = line.trim().split(" ");
-    if (parts.length >= 3) {
-      const name = parts[0].toUpperCase();
-      const level = parts[1];
-      const gender = parts[2];
-      db.ref("nameTags").push({ name, level, gender, court: "namePool" });
-    }
-  });
-  document.getElementById("inputArea").value = "";
-}
+const firebaseConfig = {
+  apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
+  authDomain: "cock-5c32d.firebaseapp.com",
+  databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
+  projectId: "cock-5c32d",
+  storageBucket: "cock-5c32d.appspot.com",
+  messagingSenderId: "639370966543",
+  appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+const tagRefs = {};
 
 function createTag(key, data) {
+  if (tagRefs[key]) return; // prevent duplicate creation
   const tag = document.createElement("div");
   tag.className = "name-tag";
   tag.dataset.key = key;
   tag.textContent = `${data.name} ${data.level}`.toUpperCase();
   tag.classList.add(data.gender === "남" ? "male" : "female");
+
   tag.addEventListener("contextmenu", e => {
     e.preventDefault();
     if (confirm("이 이름표를 삭제할까요?")) {
@@ -291,173 +278,11 @@ function createTag(key, data) {
       tag.dataset.lastTouch = 0;
     }
   });
+
+  tagRefs[key] = tag;
   return tag;
 }
 
-function resetCourt(courtId) {
-  Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.parentElement.id === courtId) {
-      db.ref("nameTags/" + key).update({ court: "namePool" });
-    }
-  });
-}
-
-function resetToWait(waitId) {
-  Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.parentElement.id === waitId) {
-      db.ref("nameTags/" + key).update({ court: "namePool" });
-    }
-  });
-}
-
-function moveAllToCourt(fromId, toId) {
-  const fromEl = document.getElementById(fromId);
-  const toEl = document.getElementById(toId);
-  const tags = fromEl.querySelectorAll('.name-tag');
-  let countInCourt = toEl.querySelectorAll('.name-tag').length;
-  tags.forEach(tag => {
-    if (countInCourt < 4) {
-      toEl.appendChild(tag);
-      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
-      countInCourt++;
-    }
-  });
-}
-
-["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
-  new Sortable(document.getElementById(id), {
-    group: "shared",
-    animation: 150,
-    onAdd: function(evt) {
-      if (evt.to.querySelectorAll('.name-tag').length > 4) {
-        evt.from.appendChild(evt.item);
-        alert("각 칸에는 최대 4명까지만 배정할 수 있습니다.");
-        return;
-      }
-      const court = evt.to.id;
-      const key = evt.item.dataset.key;
-      db.ref("nameTags/" + key).update({ court });
-    }
-  });
-});
-
-db.ref("nameTags").on("child_added", snap => {
-  const key = snap.key;
-  if (tagRefs[key]) return;  // prevent duplicate rendering
-  const data = snap.val();
-  const tag = createTag(key, data);
-  tagRefs[key] = tag;
-  document.getElementById(data.court || "namePool").appendChild(tag);
-});
-
-db.ref("nameTags").on("child_removed", snap => {
-  const tag = tagRefs[snap.key];
-  if (tag) tag.remove();
-  delete tagRefs[snap.key];
-});
-
-db.ref("nameTags").on("child_changed", snap => {
-  const key = snap.key;
-  const data = snap.val();
-  const tag = tagRefs[key];
-  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
-});
-
-window.onload = () => {
-  document.getElementById("generateBtn").onclick = generateTags;
-  document.getElementById("inputArea").addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      generateTags();
-    }
-  });
-};</script><script>
-function getBadge(tag) {
-  let badge = tag.querySelector('.badge');
-  if (!badge) {
-    badge = document.createElement('span');
-    badge.className = 'badge';
-    badge.textContent = '0';
-    badge.ondblclick = function () {
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.value = badge.textContent;
-      input.style.width = '40px';
-      badge.textContent = '';
-      badge.appendChild(input);
-      input.focus();
-      input.onblur = () => {
-        badge.textContent = input.value || '0';
-      };
-      input.onkeydown = (e) => {
-        if (e.key === 'Enter') input.blur();
-      };
-    };
-    tag.insertBefore(badge, tag.firstChild);
-  }
-  return badge;
-}
-
-function endCourt(courtId) {
-  const court = document.getElementById(courtId);
-  const namePool = document.getElementById('namePool');
-  const tags = court.querySelectorAll('.name-tag');
-  tags.forEach(tag => {
-    namePool.appendChild(tag);
-    const badge = getBadge(tag);
-    badge.textContent = String(parseInt(badge.textContent || '0') + 1);
-    db.ref("nameTags/" + tag.dataset.key).update({ court: "namePool" });
-  });
-}
-
-function sortDefault() {
-  const namePool = document.getElementById('namePool');
-  const tags = [...namePool.querySelectorAll('.name-tag')];
-  tags.forEach(tag => namePool.appendChild(tag)); // restore original order
-}
-
-function sortByLevel() {
-  const namePool = document.getElementById('namePool');
-  const tags = [...namePool.querySelectorAll('.name-tag')];
-  tags.sort((a, b) => {
-    const aLevel = a.textContent.split(' ')[1];
-    const bLevel = b.textContent.split(' ')[1];
-    return aLevel.localeCompare(bLevel);
-  });
-  tags.forEach(tag => namePool.appendChild(tag));
-}
-
-function sortByCount() {
-  const namePool = document.getElementById('namePool');
-  const tags = [...namePool.querySelectorAll('.name-tag')];
-  tags.sort((a, b) => {
-    const aCount = parseInt(getBadge(a).textContent || '0');
-    const bCount = parseInt(getBadge(b).textContent || '0');
-    return bCount - aCount;
-  });
-  tags.forEach(tag => namePool.appendChild(tag));
-}
-
-// adjust badge UI styling
-const style = document.createElement("style");
-style.textContent = `
-.badge {
-  position: absolute;
-  top: 2px;
-  left: 4px;
-  background-color: #800020;
-  color: white;
-  border-radius: 10px;
-  padding: 2px 6px;
-  font-size: 12px;
-  font-weight: bold;
-}
-.name-tag {
-  position: relative;
-}
-`;
-document.head.appendChild(style);
-</script><script>
 function generateTags() {
   const input = document.getElementById("inputArea").value.trim();
   const lines = input.split("\n");
@@ -472,6 +297,53 @@ function generateTags() {
   });
   document.getElementById("inputArea").value = "";
 }
+
+function resetCourt(courtId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === courtId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
+
+["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
+  new Sortable(document.getElementById(id), {
+    group: "shared",
+    animation: 150,
+    onAdd: function(evt) {
+      const court = evt.to.id;
+      const key = evt.item.dataset.key;
+      const isCourt = ["court1","court2","court3","court4"].includes(court);
+      if (isCourt && evt.to.querySelectorAll('.name-tag').length > 4) {
+        evt.from.appendChild(evt.item);
+        alert("각 칸에는 최대 4명까지만 배정할 수 있습니다.");
+        return;
+      }
+      db.ref("nameTags/" + key).update({ court });
+    }
+  });
+});
+
+db.ref("nameTags").on("child_added", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  if (tagRefs[key]) return;
+  const tag = createTag(key, data);
+  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
+});
+
+db.ref("nameTags").on("child_removed", snap => {
+  const tag = tagRefs[snap.key];
+  if (tag) tag.remove();
+  delete tagRefs[snap.key];
+});
+
+db.ref("nameTags").on("child_changed", snap => {
+  const key = snap.key;
+  const data = snap.val();
+  const tag = tagRefs[key];
+  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
+});
 
 window.onload = () => {
   document.getElementById("generateBtn").onclick = generateTags;
