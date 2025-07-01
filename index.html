@@ -354,5 +354,108 @@ window.onload = () => {
     }
   });
 };
+
+function resetToWait(waitId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === waitId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
+}
+
+function moveAllToCourt(fromId, toId) {
+  const fromEl = document.getElementById(fromId);
+  const toEl = document.getElementById(toId);
+  const tags = fromEl.querySelectorAll('.name-tag');
+  let countInCourt = toEl.querySelectorAll('.name-tag').length;
+  tags.forEach(tag => {
+    const isCourt = ["court1","court2","court3","court4"].includes(toId);
+    if (!isCourt || countInCourt < 4) {
+      toEl.appendChild(tag);
+      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
+      if (isCourt) countInCourt++;
+    }
+  });
+}
+
+function endCourt(courtId) {
+  const court = document.getElementById(courtId);
+  const namePool = document.getElementById("namePool");
+  const tags = court.querySelectorAll('.name-tag');
+  tags.forEach(tag => {
+    namePool.appendChild(tag);
+    const badge = getBadge(tag);
+    badge.textContent = String(parseInt(badge.textContent || '0') + 1);
+    db.ref("nameTags/" + tag.dataset.key).update({ court: "namePool" });
+  });
+}
+
+function getBadge(tag) {
+  let badge = tag.querySelector('.badge');
+  if (!badge) {
+    badge = document.createElement('span');
+    badge.className = 'badge';
+    badge.textContent = '0';
+    badge.ondblclick = function () {
+      const input = document.createElement('input');
+      input.type = 'number';
+      input.value = badge.textContent;
+      input.style.width = '40px';
+      badge.textContent = '';
+      badge.appendChild(input);
+      input.focus();
+      input.onblur = () => {
+        badge.textContent = input.value || '0';
+      };
+      input.onkeydown = (e) => {
+        if (e.key === 'Enter') input.blur();
+      };
+    };
+    tag.insertBefore(badge, tag.firstChild);
+  }
+  return badge;
+}
+
+function sortByLevel() {
+  const namePool = document.getElementById("namePool");
+  const tags = [...namePool.querySelectorAll(".name-tag")];
+  tags.sort((a, b) => {
+    const aLevel = a.textContent.split(" ")[1];
+    const bLevel = b.textContent.split(" ")[1];
+    return aLevel.localeCompare(bLevel);
+  });
+  tags.forEach(tag => namePool.appendChild(tag));
+}
+
+function sortByCount() {
+  const namePool = document.getElementById("namePool");
+  const tags = [...namePool.querySelectorAll(".name-tag")];
+  tags.sort((a, b) => {
+    const aCount = parseInt(getBadge(a).textContent || '0');
+    const bCount = parseInt(getBadge(b).textContent || '0');
+    return bCount - aCount;
+  });
+  tags.forEach(tag => namePool.appendChild(tag));
+}
+
+// Badge Style
+const style = document.createElement("style");
+style.textContent = `
+.badge {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  background-color: #800020;
+  color: white;
+  border-radius: 10px;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.name-tag {
+  position: relative;
+}
+`;
+document.head.appendChild(style);
 </script></body>
 </html>
