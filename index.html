@@ -769,5 +769,32 @@ function sortNamePoolByCount() {
   tags.forEach(tag => pool.appendChild(tag));
 }
 </script>
+
+<script>
+function generateTags() {
+  const input = document.getElementById("inputArea").value.trim();
+  const lines = input.split("\n");
+  lines.forEach(line => {
+    const parts = line.trim().split(" ");
+    if (parts.length >= 3) {
+      const name = parts[0].toUpperCase();
+      const level = parts[1];
+      const gender = parts[2];
+      db.ref("nameTags").push({ name, level, gender, court: "namePool" });
+    }
+  });
+  document.getElementById("inputArea").value = "";
+}
+
+window.onload = () => {
+  document.getElementById("generateBtn").onclick = generateTags;
+  document.getElementById("inputArea").addEventListener("keydown", e => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      generateTags();
+    }
+  });
+};
+</script>
 </body>
 </html>
