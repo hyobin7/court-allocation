@@ -1,248 +1,6 @@
-
 <!DOCTYPE html>
 
-<html lang="ko">
-<head>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<style>
-    .main-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-        gap: 10px;
-    }
-    .courts {
-        flex: none;
-        width: 72%;
-        max-width: 72%;
-    }
-    #namePool {
-        flex: none;
-        width: 72%;
-        max-width: 72%;
-    }
-    #assignmentTable {
-        flex: none;
-        width: 50%;
-        max-width: 50%;
-    }
-    @media (max-width: 768px) {
-        .main-container {
-            flex-direction: column !important;
-        }
-        .court, #namePool, #assignmentTable {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .main-container {
-            flex-direction: column !important;
-        }
-        .court, #namePool, #assignmentTable {
-            width: 100% !important;
-        }
-    }
-    </style>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>배드민턴 코트 배정</title>
-<style>
-    .main-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-        gap: 10px;
-    }
-    .courts {
-        flex: none;
-        width: 72%;
-        max-width: 72%;
-    }
-    #namePool {
-        flex: none;
-        width: 72%;
-        max-width: 72%;
-    }
-    #assignmentTable {
-        flex: none;
-        width: 50%;
-        max-width: 50%;
-    }
-    @media (max-width: 768px) {
-        .main-container {
-            flex-direction: column !important;
-        }
-        .court, #namePool, #assignmentTable {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-    }
-    
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 1em;
-      background: #f0f8ff;
-    }
-    h2 { text-align: center; }
-    textarea {
-      width: 100%;
-      height: 100px;
-      margin-bottom: 1em;
-      font-size: 16px;
-    }
-    .btn {
-      width: 100%;
-      padding: 12px;
-      background-color: #007bff;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .layout {
-      display: flex;
-      flex-direction: row;
-      height: 100%;
-    }
-    .courts {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 0 0 50%;
-      min-width: 140px;
-    }
-    .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-
-      background: #fff;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      min-height: 100px;
-      flex-grow: 1;
-    }
-    .column h3 {
-      text-align: center;
-      margin: 0 0 5px 0;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .reset-btn {
-      background-color: #ff6666;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .name-tag {
-  width: calc(50% - 10px);
-  display: inline-block;
-  vertical-align: top;
-  box-sizing: border-box;
-  margin: 5px;
-  height: 50px;
-      padding: 8px;
-      margin: 5px 0;
-      border: 1px solid;
-      border-radius: 4px;
-      cursor: grab;
-      text-align: center;
-      user-select: none;
-      font-size: 16px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    .male {
-      background-color: #cce5ff;
-      border-color: #3399ff;
-    }
-    .female {
-      background-color: #ffd6e8;
-      border-color: #ff66b2;
-    }
-    #namePool {
-      flex: 0 0 50%;
-      background: #fff;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
-    }
-    html, body { height: 100%; }
-    @media (max-width: 768px) {
-      .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
- min-height: 16px !important; }
-      .layout { flex-direction: row; }
-    }
-    .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
- min-height: 80px !important; }
-    .courts { gap: 5px !important; }
-  </style>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script></head>
-<body>
-<h2>배드민턴 코트 배정</h2>
-<textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
-<button class="btn" id="generateBtn">이름표 만들기</button>
-<div class="waiting-extra" style="display: flex; gap: 10px; margin-bottom: 20px;">
-<div class="column" id="wait1">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 1</h3>
-<button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
-</div>
-</div>
-</div>
-<div class="column" id="wait2">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 2</h3>
-<button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
-</div>
-</div>
-</div>
-</div>
-<div class="layout">
-<div class="courts">
-<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-btn" onclick="endCourt('court1')">종료</button></div></div>
-<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-btn" onclick="endCourt('court2')">종료</button></div></div>
-<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-btn" onclick="endCourt('court3')">종료</button></div></div>
-<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-btn" onclick="endCourt('court4')">종료</button></div></div>
-</div>
-<div class="column" id="namePool"><div class="header"><h3>대기</h3><div style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;"><button class="reset-btn" onclick="sortByLevel()">급수정렬</button><button class="reset-btn" onclick="sortByCount()">횟수정렬</button></div></div></div>
-</div>
-<script>
+<html lang="ko"><head><meta charset="utf-8"/><title>배드민턴 코트 배정</title><script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script><meta content="width=device-width, initial-scale=1" name="viewport"/></head><body><script>
 const firebaseConfig = {
   apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
   authDomain: "cock-5c32d.firebaseapp.com",
@@ -254,14 +12,14 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-const tagRefs = {};
+let tagRefs = {};
 
 function createTag(key, data) {
-  if (tagRefs[key]) return; // prevent duplicate creation
+  if (tagRefs[key]) return;
   const tag = document.createElement("div");
   tag.className = "name-tag";
   tag.dataset.key = key;
-  tag.textContent = `${data.name} ${data.level}`.toUpperCase();
+  tag.textContent = data.name + " " + data.level;
   tag.classList.add(data.gender === "남" ? "male" : "female");
 
   tag.addEventListener("contextmenu", e => {
@@ -270,6 +28,7 @@ function createTag(key, data) {
       db.ref("nameTags/" + key).remove();
     }
   });
+
   tag.addEventListener("touchend", function(e) {
     if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
       tag.dataset.lastTouch = Date.now();
@@ -278,6 +37,22 @@ function createTag(key, data) {
       tag.dataset.lastTouch = 0;
     }
   });
+
+  // badge
+  const badge = document.createElement("span");
+  badge.className = "badge";
+  badge.textContent = "0";
+  badge.ondblclick = function () {
+    const input = document.createElement("input");
+    input.type = "number";
+    input.value = badge.textContent;
+    badge.innerHTML = "";
+    badge.appendChild(input);
+    input.focus();
+    input.onblur = () => badge.textContent = input.value || '0';
+    input.onkeydown = (e) => { if (e.key === "Enter") input.blur(); };
+  };
+  tag.insertBefore(badge, tag.firstChild);
 
   tagRefs[key] = tag;
   return tag;
@@ -289,13 +64,21 @@ function generateTags() {
   lines.forEach(line => {
     const parts = line.trim().split(" ");
     if (parts.length >= 3) {
-      const name = parts[0].toUpperCase();
+      const name = parts[0];
       const level = parts[1];
       const gender = parts[2];
       db.ref("nameTags").push({ name, level, gender, court: "namePool" });
     }
   });
   document.getElementById("inputArea").value = "";
+}
+
+function resetToWait(waitId) {
+  Object.entries(tagRefs).forEach(([key, el]) => {
+    if (el.parentElement.id === waitId) {
+      db.ref("nameTags/" + key).update({ court: "namePool" });
+    }
+  });
 }
 
 function resetCourt(courtId) {
@@ -306,15 +89,62 @@ function resetCourt(courtId) {
   });
 }
 
-["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
+function moveAllToCourt(fromId, toId) {
+  const fromEl = document.getElementById(fromId);
+  const toEl = document.getElementById(toId);
+  const tags = fromEl.querySelectorAll('.name-tag');
+  let count = toEl.querySelectorAll('.name-tag').length;
+  tags.forEach(tag => {
+    if (["court1", "court2", "court3"].includes(toId)) {
+      if (count < 4) {
+        db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
+        count++;
+      }
+    } else {
+      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
+    }
+  });
+}
+
+function endCourt(courtId) {
+  const court = document.getElementById(courtId);
+  const namePool = document.getElementById("namePool");
+  const tags = court.querySelectorAll('.name-tag');
+  tags.forEach(tag => {
+    namePool.appendChild(tag);
+    const badge = tag.querySelector('.badge');
+    badge.textContent = parseInt(badge.textContent || "0") + 1;
+    db.ref("nameTags/" + tag.dataset.key).update({ court: "namePool" });
+  });
+}
+
+function sortByLevel() {
+  const pool = document.getElementById("namePool");
+  const tags = [...pool.querySelectorAll(".name-tag")];
+  tags.sort((a, b) => a.textContent.split(" ")[1].localeCompare(b.textContent.split(" ")[1]));
+  tags.forEach(t => pool.appendChild(t));
+}
+
+function sortByCount() {
+  const pool = document.getElementById("namePool");
+  const tags = [...pool.querySelectorAll(".name-tag")];
+  tags.sort((a, b) => {
+    const aCount = parseInt(a.querySelector('.badge')?.textContent || 0);
+    const bCount = parseInt(b.querySelector('.badge')?.textContent || 0);
+    return bCount - aCount;
+  });
+  tags.forEach(t => pool.appendChild(t));
+}
+
+["namePool", "wait1", "wait2", "court1", "court2", "court3"].forEach(id => {
   new Sortable(document.getElementById(id), {
     group: "shared",
     animation: 150,
-    onAdd: function(evt) {
-      const court = evt.to.id;
+    onAdd: evt => {
       const key = evt.item.dataset.key;
-      const isCourt = ["court1","court2","court3","court4"].includes(court);
-      if (isCourt && evt.to.querySelectorAll('.name-tag').length > 4) {
+      const court = evt.to.id;
+      if (["court1", "court2", "court3"].includes(court) &&
+          evt.to.querySelectorAll('.name-tag').length > 4) {
         evt.from.appendChild(evt.item);
         alert("각 칸에는 최대 4명까지만 배정할 수 있습니다.");
         return;
@@ -331,17 +161,14 @@ db.ref("nameTags").on("child_added", snap => {
   const tag = createTag(key, data);
   if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
 });
-
 db.ref("nameTags").on("child_removed", snap => {
   const tag = tagRefs[snap.key];
   if (tag) tag.remove();
   delete tagRefs[snap.key];
 });
-
 db.ref("nameTags").on("child_changed", snap => {
-  const key = snap.key;
+  const tag = tagRefs[snap.key];
   const data = snap.val();
-  const tag = tagRefs[key];
   if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
 });
 
@@ -354,108 +181,4 @@ window.onload = () => {
     }
   });
 };
-
-function resetToWait(waitId) {
-  Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.parentElement.id === waitId) {
-      db.ref("nameTags/" + key).update({ court: "namePool" });
-    }
-  });
-}
-
-function moveAllToCourt(fromId, toId) {
-  const fromEl = document.getElementById(fromId);
-  const toEl = document.getElementById(toId);
-  const tags = fromEl.querySelectorAll('.name-tag');
-  let countInCourt = toEl.querySelectorAll('.name-tag').length;
-  tags.forEach(tag => {
-    const isCourt = ["court1","court2","court3","court4"].includes(toId);
-    if (!isCourt || countInCourt < 4) {
-      toEl.appendChild(tag);
-      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
-      if (isCourt) countInCourt++;
-    }
-  });
-}
-
-function endCourt(courtId) {
-  const court = document.getElementById(courtId);
-  const namePool = document.getElementById("namePool");
-  const tags = court.querySelectorAll('.name-tag');
-  tags.forEach(tag => {
-    namePool.appendChild(tag);
-    const badge = getBadge(tag);
-    badge.textContent = String(parseInt(badge.textContent || '0') + 1);
-    db.ref("nameTags/" + tag.dataset.key).update({ court: "namePool" });
-  });
-}
-
-function getBadge(tag) {
-  let badge = tag.querySelector('.badge');
-  if (!badge) {
-    badge = document.createElement('span');
-    badge.className = 'badge';
-    badge.textContent = '0';
-    badge.ondblclick = function () {
-      const input = document.createElement('input');
-      input.type = 'number';
-      input.value = badge.textContent;
-      input.style.width = '40px';
-      badge.textContent = '';
-      badge.appendChild(input);
-      input.focus();
-      input.onblur = () => {
-        badge.textContent = input.value || '0';
-      };
-      input.onkeydown = (e) => {
-        if (e.key === 'Enter') input.blur();
-      };
-    };
-    tag.insertBefore(badge, tag.firstChild);
-  }
-  return badge;
-}
-
-function sortByLevel() {
-  const namePool = document.getElementById("namePool");
-  const tags = [...namePool.querySelectorAll(".name-tag")];
-  tags.sort((a, b) => {
-    const aLevel = a.textContent.split(" ")[1];
-    const bLevel = b.textContent.split(" ")[1];
-    return aLevel.localeCompare(bLevel);
-  });
-  tags.forEach(tag => namePool.appendChild(tag));
-}
-
-function sortByCount() {
-  const namePool = document.getElementById("namePool");
-  const tags = [...namePool.querySelectorAll(".name-tag")];
-  tags.sort((a, b) => {
-    const aCount = parseInt(getBadge(a).textContent || '0');
-    const bCount = parseInt(getBadge(b).textContent || '0');
-    return bCount - aCount;
-  });
-  tags.forEach(tag => namePool.appendChild(tag));
-}
-
-// Badge Style
-const style = document.createElement("style");
-style.textContent = `
-.badge {
-  position: absolute;
-  top: 2px;
-  left: 4px;
-  background-color: #800020;
-  color: white;
-  border-radius: 10px;
-  padding: 2px 6px;
-  font-size: 12px;
-  font-weight: bold;
-}
-.name-tag {
-  position: relative;
-}
-`;
-document.head.appendChild(style);
-</script></body>
-</html>
+</script></body></html>
