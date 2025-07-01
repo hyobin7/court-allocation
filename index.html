@@ -277,220 +277,6 @@
 </div>
 </div><div class="tag-container"></div></div></div>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
-  authDomain: "cock-5c32d.firebaseapp.com",
-  databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
-  projectId: "cock-5c32d",
-  storageBucket: "cock-5c32d.appspot.com",
-  messagingSenderId: "639370966543",
-  appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const tagRefs = {};
-
-function generateTags() {
-  const input = document.getElementById("inputArea").value.trim();
-  const lines = input.split("\n");
-  lines.forEach(line => {
-    const parts = line.trim().split(" ");
-    if (parts.length >= 3) {
-      const name = parts[0].toUpperCase();
-      const level = parts[1];
-      const gender = parts[2];
-      db.ref("nameTags").push({ name, level, gender, court: "namePool" });
-    }
-  });
-  document.getElementById("inputArea").value = "";
-}
-
-function createTag(key, data) {
-  const tag = document.createElement("div");
-  tag.className = "name-tag";
-  tag.dataset.key = key;
-  tag.textContent = `${data.name} ${data.level}`.toUpperCase();
-  tag.classList.add(data.gender === "남" ? "male" : "female");
-  tag.addEventListener("contextmenu", e => {
-    e.preventDefault();
-    if (confirm("이 이름표를 삭제할까요?")) {
-      db.ref("nameTags/" + key).remove();
-    }
-  });
-  tag.addEventListener("touchend", function(e) {
-    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
-      tag.dataset.lastTouch = Date.now();
-    } else {
-      db.ref("nameTags/" + key).remove();
-      tag.dataset.lastTouch = 0;
-    }
-  });
-  return tag;
-}
-
-function resetCourt(courtId) {
-  Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.parentElement.id === courtId) {
-      db.ref("nameTags/" + key).update({ court: "namePool" });
-    }
-  });
-}
-
-function resetToWait(waitId) {
-  Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.parentElement.id === waitId) {
-      db.ref("nameTags/" + key).update({ court: "namePool" });
-    }
-  });
-}
-
-function moveAllToCourt(fromId, toId) {
-  const fromEl = document.getElementById(fromId);
-  const toEl = document.getElementById(toId);
-  const tags = fromEl.querySelectorAll('.name-tag');
-  let countInCourt = toEl.querySelectorAll('.name-tag').length;
-  tags.forEach(tag => {
-    if (countInCourt < 4) {
-      toEl.appendChild(tag);
-      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
-      countInCourt++;
-    }
-  });
-}
-
-["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
-  new Sortable(document.getElementById(id), {
-    group: "shared",
-    animation: 150,
-    onAdd: function(evt) {
-      if (evt.to.querySelectorAll('.name-tag').length > 4) {
-        evt.from.appendChild(evt.item);
-        alert("각 칸에는 최대 4명까지만 배정할 수 있습니다.");
-        return;
-      }
-      const court = evt.to.id;
-      const key = evt.item.dataset.key;
-      db.ref("nameTags/" + key).update({ court });
-      if (["court1","court2","court3","court4"].includes(court)) updateCount(evt.item.textContent.split(" ")[0]);
-    }
-  });
-});
-
-db.ref("nameTags").on("child_added", snap => {
-  const key = snap.key;
-  const data = snap.val();
-  const tag = createTag(key, data);
-  tagRefs[key] = tag;
-  document.getElementById(data.court || "namePool").appendChild(tag);
-});
-
-db.ref("nameTags").on("child_removed", snap => {
-  const tag = tagRefs[snap.key];
-  if (tag) tag.remove();
-  delete tagRefs[snap.key];
-});
-
-db.ref("nameTags").on("child_changed", snap => {
-  const key = snap.key;
-  const data = snap.val();
-  const tag = tagRefs[key];
-  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
-});
-
-window.onload = () => {
-  document.getElementById("generateBtn").onclick = generateTags;
-  document.getElementById("inputArea").addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      generateTags();
-    }
-  });
-};
-
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-}
-
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-        } else {
-          input.value = oldValue;
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-  }
-}
-
-  sortKey = "name";
-  sortAsc = !sortAsc;
-};
-  sortKey = "count";
-  sortAsc = !sortAsc;
-};
-
-
-
-function sortNamePoolByLevel() {
-  const pool = document.querySelector("#namePool .tag-container");
-  const tags = Array.from(pool.querySelectorAll(".name-tag"));
-  tags.sort((a, b) => {
-    const aLevel = parseInt(a.textContent.split(" ")[1]) || 0;
-    const bLevel = parseInt(b.textContent.split(" ")[1]) || 0;
-    return bLevel - aLevel;
-  });
-  tags.forEach(tag => pool.appendChild(tag));
-}
-
-function sortNamePoolByCount() {
-  const pool = document.querySelector("#namePool .tag-container");
-  const tags = Array.from(pool.querySelectorAll(".name-tag"));
-  tags.sort((a, b) => {
-    const aCount = parseInt(a.querySelector(".count-badge")?.textContent) || 0;
-    const bCount = parseInt(b.querySelector(".count-badge")?.textContent) || 0;
-    return aCount - bCount;
-  });
-  tags.forEach(tag => pool.appendChild(tag));
-}
-
-
 document.getElementById("createTagBtn").addEventListener("click", createNameTag);
 document.getElementById("nameInput").addEventListener("keypress", function (e) {
   if (e.key === "Enter") {
@@ -502,18 +288,22 @@ function createNameTag() {
   const input = document.getElementById("nameInput").value.trim();
   if (!input) return;
   const parts = input.split(/\s+/);
-  if (parts.length < 3) return;
+  if (parts.length !== 3) {
+    alert("이름 급수 성별 순으로 입력해주세요. 예: 김영수 C 남");
+    return;
+  }
 
-  const [name, grade, gender] = parts;
+  const [name, level, gender] = parts;
   const tag = document.createElement("div");
   tag.className = "name-tag " + (gender === "남" ? "male" : "female");
   tag.innerHTML = `
     <div class="count-badge">0</div>
-    ${name} ${grade}
+    ${name} ${level}
   `;
   tag.draggable = true;
   tag.addEventListener("dragstart", handleDragStart);
-  
+
+  // 삭제 (PC: 우클릭, 모바일: 오래 누르기)
   let pressTimer;
   tag.addEventListener("contextmenu", function (e) {
     e.preventDefault();
@@ -527,7 +317,6 @@ function createNameTag() {
   tag.addEventListener("touchend", function (e) {
     clearTimeout(pressTimer);
   });
-
 
   document.querySelector("#namePool .tag-container").appendChild(tag);
   document.getElementById("nameInput").value = "";
