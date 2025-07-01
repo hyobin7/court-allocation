@@ -1,10 +1,9 @@
 
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
     .main-container {
         display: flex;
         justify-content: space-between;
@@ -44,51 +43,11 @@
             width: 100% !important;
         }
     }
-    
-.badge {
-  position: absolute;
-  top: -6px;
-  left: -6px;
-  background-color: #800020;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2;
-}
-.name-tag {
-  position: relative;
-}
-.sort-btns {
-  display: flex;
-  gap: 5px;
-  margin-bottom: 8px;
-}
-.sort-btns button {
-  background-color: #ff6666;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-#namePool {
-  flex-grow: 1;
-  width: auto !important;
-  max-width: 100% !important;
-}
-</style>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>배드민턴 코트 배정</title>
-<style>
+    </style>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>배드민턴 코트 배정</title>
+  <style>
     .main-container {
         display: flex;
         justify-content: space-between;
@@ -237,7 +196,7 @@
  min-height: 80px !important; }
     .courts { gap: 5px !important; }
   </style>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
 let countMap = {};
 let sortKey = 'name';
 let sortAsc = true;
@@ -309,7 +268,7 @@ document.getElementById("thCount").onclick = () => {
 };
 
 </script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
 let countMap = {};
 let sortKey = 'name';
 let sortAsc = true;
@@ -381,7 +340,7 @@ document.getElementById("thCount").onclick = () => {
 };
 
 </script>
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
+  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
 let countMap = {};
 let sortKey = 'name';
 let sortAsc = true;
@@ -453,62 +412,67 @@ document.getElementById("thCount").onclick = () => {
 };
 
 </script>
-</meta></head>
+</head>
 <body>
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
 <button class="btn" id="generateBtn">이름표 만들기</button>
+
 <div class="waiting-extra" style="display: flex; gap: 10px; margin-bottom: 20px;">
-<div class="column" id="wait1">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 1</h3>
-<button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
+  <div class="column" id="wait1">
+    <div class="header" style="flex-direction: column; align-items: flex-start;">
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+        <h3 style="margin: 0;">대기 1</h3>
+        <button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
+        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
+        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
+        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
+      </div>
+    </div>
+  </div>
+  <div class="column" id="wait2">
+    <div class="header" style="flex-direction: column; align-items: flex-start;">
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+        <h3 style="margin: 0;">대기 2</h3>
+        <button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
+        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
+        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
+        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
+        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
+      </div>
+    </div>
+  </div>
 </div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
-</div>
-</div>
-</div>
-<div class="column" id="wait2">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 2</h3>
-<button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
-</div>
-</div>
-</div>
-</div>
+
 <div class="layout">
-<div class="courts">
-<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-btn" onclick="endCourt('court1')">종료</button></div></div>
-<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-btn" onclick="endCourt('court2')">종료</button></div></div>
-<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-btn" onclick="endCourt('court3')">종료</button></div></div>
-<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-btn" onclick="endCourt('court4')">종료</button></div></div>
+  <div class="courts">
+    <div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button></div></div>
+    <div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button></div></div>
+    <div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button></div></div>
+    <div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button></div></div>
+  </div>
+  
+  <div class="column" id="namePool"><div class="header"><h3>대기</h3></div></div>
+  <div class="column" id="statsTableContainer" style="min-width: 200px; background: #fff;">
+    <table border="1" style="width: 100%; border-collapse: collapse; font-size: 14px;">
+      <thead>
+        <tr>
+          <th id="thName" style="cursor:pointer;">이름 🔽</th>
+          <th id="thCount" style="cursor:pointer;">횟수</th>
+        </tr>
+      </thead>
+      <tbody id="statsTableBody"></tbody>
+    </table>
+  </div>
+
 </div>
-<div class="column" id="namePool"><div class="sort-btns"><button onclick="sortNamePool('대기')">대기</button><button onclick="sortNamePool('급수정렬')">급수정렬</button><button onclick="sortNamePool('횟수정렬')">횟수정렬</button></div><div class="header"><h3>대기</h3></div></div>
-<div class="column" id="statsTableContainer" style="min-width: 200px; background: #fff;">
-<table border="1" style="width: 100%; border-collapse: collapse; font-size: 14px;">
-<thead>
-<tr>
-<th id="thName" style="cursor:pointer;">이름 🔽</th>
-<th id="thCount" style="cursor:pointer;">횟수</th>
-</tr>
-</thead>
-<tbody id="statsTableBody"></tbody>
-</table>
-</div>
-</div>
+
 <script>
 const firebaseConfig = {
   apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
@@ -710,56 +674,6 @@ document.getElementById("thCount").onclick = () => {
   renderTable();
 };
 
-</script><script>
-function sortNamePool(type) {
-  const pool = document.getElementById("namePool");
-  const tags = Array.from(pool.querySelectorAll(".name-tag"));
-  tags.sort((a, b) => {
-    if (type === "급수정렬") return a.textContent.localeCompare(b.textContent);
-    if (type === "횟수정렬") {
-      const aCount = parseInt(a.querySelector(".badge")?.textContent || 0);
-      const bCount = parseInt(b.querySelector(".badge")?.textContent || 0);
-      return bCount - aCount;
-    }
-    return 0;
-  });
-  tags.forEach(tag => pool.appendChild(tag));
-}
-
-function endCourt(courtId) {
-  const court = document.getElementById(courtId);
-  const tags = court.querySelectorAll('.name-tag');
-  tags.forEach(tag => {
-    const badge = tag.querySelector(".badge");
-    if (badge) badge.textContent = parseInt(badge.textContent) + 1;
-    else {
-      const newBadge = document.createElement("div");
-      newBadge.className = "badge";
-      newBadge.textContent = "1";
-      newBadge.ondblclick = () => editBadge(newBadge);
-      tag.appendChild(newBadge);
-    }
-    document.getElementById("namePool").appendChild(tag);
-  });
-}
-
-function editBadge(badgeEl) {
-  const oldValue = badgeEl.textContent;
-  const input = document.createElement("input");
-  input.type = "number";
-  input.value = oldValue;
-  input.style.width = "20px";
-  badgeEl.textContent = "";
-  badgeEl.appendChild(input);
-  input.focus();
-  const save = () => {
-    const val = parseInt(input.value, 10);
-    if (!isNaN(val)) badgeEl.textContent = val;
-    else badgeEl.textContent = oldValue;
-  };
-  input.onblur = save;
-  input.onkeydown = (e) => { if (e.key === "Enter") save(); };
-}
 </script>
 </body>
 </html>
