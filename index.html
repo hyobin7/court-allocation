@@ -1,9 +1,10 @@
 
 <!DOCTYPE html>
+
 <html lang="ko">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<style>
     .main-container {
         display: flex;
         justify-content: space-between;
@@ -43,11 +44,45 @@
             width: 100% !important;
         }
     }
-    </style>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>배드민턴 코트 배정</title>
-  <style>
+    
+.badge {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  background-color: #800020;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+.name-tag {
+  position: relative;
+}
+.sort-btns {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+.sort-btns button {
+  background-color: #ff6666;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  cursor: pointer;
+}
+</style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>배드민턴 코트 배정</title>
+<style>
     .main-container {
         display: flex;
         justify-content: space-between;
@@ -196,484 +231,209 @@
  min-height: 80px !important; }
     .courts { gap: 5px !important; }
   </style>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
+<style>
+.name-tag {
+  position: relative;
+  padding-left: 22px;
 }
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
+.badge {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background-color: #800020;
+  color: white;
+  font-size: 10px;
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  border-radius: 50%;
+  text-align: center;
+  cursor: pointer;
 }
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
-  <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
-</head>
+</style></head>
 <body>
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
 <button class="btn" id="generateBtn">이름표 만들기</button>
-
 <div class="waiting-extra" style="display: flex; gap: 10px; margin-bottom: 20px;">
-  <div class="column" id="wait1">
-    <div class="header" style="flex-direction: column; align-items: flex-start;">
-      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-        <h3 style="margin: 0;">대기 1</h3>
-        <button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
-      </div>
-      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
-      </div>
-    </div>
-  </div>
-  <div class="column" id="wait2">
-    <div class="header" style="flex-direction: column; align-items: flex-start;">
-      <div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-        <h3 style="margin: 0;">대기 2</h3>
-        <button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
-      </div>
-      <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
-        <button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
-      </div>
-    </div>
-  </div>
+<div class="column" id="wait1">
+<div class="header" style="flex-direction: column; align-items: flex-start;">
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+<h3 style="margin: 0;">대기 1</h3>
+<button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
 </div>
-
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
+</div>
+</div>
+</div>
+<div class="column" id="wait2">
+<div class="header" style="flex-direction: column; align-items: flex-start;">
+<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
+<h3 style="margin: 0;">대기 2</h3>
+<button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
+<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
+</div>
+</div>
+</div>
+</div>
 <div class="layout">
-  <div class="courts">
-    <div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button></div></div>
-    <div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button></div></div>
-    <div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button></div></div>
-    <div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button></div></div>
-  </div>
-  
-  <div class="column" id="namePool"><div class="header"><h3>대기</h3></div></div>
-  <div class="column" id="statsTableContainer" style="min-width: 200px; background: #fff;">
-    <table border="1" style="width: 100%; border-collapse: collapse; font-size: 14px;">
-      <thead>
-        <tr>
-          <th id="thName" style="cursor:pointer;">이름 🔽</th>
-          <th id="thCount" style="cursor:pointer;">횟수</th>
-        </tr>
-      </thead>
-      <tbody id="statsTableBody"></tbody>
-    </table>
-  </div>
-
+<div class="courts">
+<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-btn" onclick="endCourt('court1')">종료</button></div></div>
+<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-btn" onclick="endCourt('court2')">종료</button></div></div>
+<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-btn" onclick="endCourt('court3')">종료</button></div></div>
+<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-btn" onclick="endCourt('court4')">종료</button></div></div>
 </div>
-
+<div class="column" id="namePool" style="flex-grow: 1; width: 100%; max-width: 100%;">
+<div class="header"><h3>대기</h3><div class="sort-btns" style="margin-left: 10px; display: inline-flex; gap: 5px;"><button onclick="sortNamePool('급수정렬')">급수정렬</button><button onclick="sortNamePool('횟수정렬')">횟수정렬</button></div></div></div>
+</div>
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
-  authDomain: "cock-5c32d.firebaseapp.com",
-  databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
-  projectId: "cock-5c32d",
-  storageBucket: "cock-5c32d.appspot.com",
-  messagingSenderId: "639370966543",
-  appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-const tagRefs = {};
-
-function generateTags() {
-  const input = document.getElementById("inputArea").value.trim();
-  const lines = input.split("\n");
-  lines.forEach(line => {
-    const parts = line.trim().split(" ");
-    if (parts.length >= 3) {
-      const name = parts[0].toUpperCase();
-      const level = parts[1];
-      const gender = parts[2];
-      db.ref("nameTags").push({ name, level, gender, court: "namePool" });
+function sortNamePool(type) {
+  const pool = document.getElementById("namePool");
+  const tags = Array.from(pool.querySelectorAll(".name-tag"));
+  tags.sort((a, b) => {
+    if (type === "급수정렬") return a.textContent.localeCompare(b.textContent);
+    if (type === "횟수정렬") {
+      const aCount = parseInt(a.querySelector(".badge")?.textContent || 0);
+      const bCount = parseInt(b.querySelector(".badge")?.textContent || 0);
+      return bCount - aCount;
     }
+    return 0;
   });
-  document.getElementById("inputArea").value = "";
+  tags.forEach(tag => pool.appendChild(tag));
 }
 
-function createTag(key, data) {
-  const tag = document.createElement("div");
-  tag.className = "name-tag";
-  tag.dataset.key = key;
-  tag.textContent = `${data.name} ${data.level}`.toUpperCase();
-  tag.classList.add(data.gender === "남" ? "male" : "female");
-  tag.addEventListener("contextmenu", e => {
-    e.preventDefault();
-    if (confirm("이 이름표를 삭제할까요?")) {
-      db.ref("nameTags/" + key).remove();
-    }
-  });
-  tag.addEventListener("touchend", function(e) {
-    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
-      tag.dataset.lastTouch = Date.now();
-    } else {
-      db.ref("nameTags/" + key).remove();
-      tag.dataset.lastTouch = 0;
-    }
-  });
-  return tag;
-}
-
-function resetCourt(courtId) {
-  Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.parentElement.id === courtId) {
-      db.ref("nameTags/" + key).update({ court: "namePool" });
-    }
-  });
-}
-
-function resetToWait(waitId) {
-  Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.parentElement.id === waitId) {
-      db.ref("nameTags/" + key).update({ court: "namePool" });
-    }
-  });
-}
-
-function moveAllToCourt(fromId, toId) {
-  const fromEl = document.getElementById(fromId);
-  const toEl = document.getElementById(toId);
-  const tags = fromEl.querySelectorAll('.name-tag');
-  let countInCourt = toEl.querySelectorAll('.name-tag').length;
+function endCourt(courtId) {
+  const court = document.getElementById(courtId);
+  const tags = court.querySelectorAll('.name-tag');
   tags.forEach(tag => {
-    if (countInCourt < 4) {
-      toEl.appendChild(tag);
-      db.ref("nameTags/" + tag.dataset.key).update({ court: toId });
-      countInCourt++;
+    const badge = tag.querySelector(".badge");
+    if (badge) badge.textContent = parseInt(badge.textContent) + 1;
+    else {
+      const newBadge = document.createElement("div");
+      newBadge.className = "badge";
+      newBadge.textContent = "1";
+      newBadge.ondblclick = () => editBadge(newBadge);
+      tag.appendChild(newBadge);
     }
+    document.getElementById("namePool").appendChild(tag);
   });
 }
 
-["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
-  new Sortable(document.getElementById(id), {
-    group: "shared",
-    animation: 150,
-    onAdd: function(evt) {
-      if (evt.to.querySelectorAll('.name-tag').length > 4) {
-        evt.from.appendChild(evt.item);
-        alert("각 칸에는 최대 4명까지만 배정할 수 있습니다.");
-        return;
-      }
-      const court = evt.to.id;
-      const key = evt.item.dataset.key;
-      db.ref("nameTags/" + key).update({ court });
-      if (["court1","court2","court3","court4"].includes(court)) updateCount(evt.item.textContent.split(" ")[0]);
-    }
+function editBadge(badgeEl) {
+  const oldValue = badgeEl.textContent;
+  const input = document.createElement("input");
+  input.type = "number";
+  input.value = oldValue;
+  input.style.width = "20px";
+  badgeEl.textContent = "";
+  badgeEl.appendChild(input);
+  input.focus();
+  const save = () => {
+    const val = parseInt(input.value, 10);
+    if (!isNaN(val)) badgeEl.textContent = val;
+    else badgeEl.textContent = oldValue;
+  };
+  input.onblur = save;
+  input.onkeydown = (e) => { if (e.key === "Enter") save(); };
+}
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.zone').forEach(el => {
+    Sortable.create(el, {
+      group: 'shared',
+      animation: 150,
+      ghostClass: 'dragging'
+    });
   });
 });
+</script><script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.zone').forEach(el => {
+    Sortable.create(el, {
+      group: 'shared',
+      animation: 150,
+      ghostClass: 'dragging'
+    });
+  });
 
-db.ref("nameTags").on("child_added", snap => {
-  const key = snap.key;
-  const data = snap.val();
-  const tag = createTag(key, data);
-  tagRefs[key] = tag;
-  document.getElementById(data.court || "namePool").appendChild(tag);
+  // Attach all onClick and listeners only after DOM is ready
+  document.querySelectorAll('.reset-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const zone = btn.closest('.zone');
+      if (zone) {
+        const namePool = document.getElementById('namePool');
+        Array.from(zone.querySelectorAll('.name-tag')).forEach(tag => namePool.appendChild(tag));
+      }
+    });
+  });
+
+  document.querySelectorAll('.exit-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const zone = btn.closest('.zone');
+      const namePool = document.getElementById('namePool');
+      Array.from(zone.querySelectorAll('.name-tag')).forEach(tag => {
+        const badge = tag.querySelector('.badge');
+        if (badge) badge.textContent = parseInt(badge.textContent || "0") + 1;
+        namePool.appendChild(tag);
+      });
+    });
+  });
 });
+</script><script>
+document.addEventListener("DOMContentLoaded", function () {
+  const generateBtn = document.getElementById("generateBtn");
+  const inputArea = document.getElementById("inputArea");
 
-db.ref("nameTags").on("child_removed", snap => {
-  const tag = tagRefs[snap.key];
-  if (tag) tag.remove();
-  delete tagRefs[snap.key];
-});
+  function createTagsFromTextarea() {
+    const lines = inputArea.value.trim().split("\n");
 
-db.ref("nameTags").on("child_changed", snap => {
-  const key = snap.key;
-  const data = snap.val();
-  const tag = tagRefs[key];
-  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
-});
+    lines.forEach(line => {
+      const parts = line.trim().split(" ");
+      if (parts.length !== 4) return;
+      const [first, last, level, gender] = parts;
+      const name = first + " " + last;
 
-window.onload = () => {
-  document.getElementById("generateBtn").onclick = generateTags;
-  document.getElementById("inputArea").addEventListener("keydown", e => {
+      const tag = document.createElement("div");
+      tag.className = "name-tag " + (gender === "남" ? "male" : "female");
+      tag.innerHTML = '<div class="badge" ondblclick="editBadge(this)">0</div>' + name + " " + level + "급";
+
+      tag.dataset.level = level;
+      tag.dataset.count = 0;
+
+      tag.oncontextmenu = (e) => { e.preventDefault(); tag.remove(); };
+      tag.ontouchstart = () => { tag.touchTimeout = setTimeout(() => tag.remove(), 800); };
+      tag.ontouchend = () => clearTimeout(tag.touchTimeout);
+
+      document.getElementById("namePool").appendChild(tag);
+    });
+  }
+
+  generateBtn.addEventListener("click", createTagsFromTextarea);
+  inputArea.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      generateTags();
-    }
-  });
-};
-
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
+      createTagsFromTextarea();
     }
   });
 
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script>
-</body>
+  window.editBadge = function (badge) {
+    const newVal = prompt("숫자를 입력하세요", badge.innerText);
+    if (newVal !== null && !isNaN(parseInt(newVal))) {
+      badge.innerText = parseInt(newVal);
+      badge.parentElement.dataset.count = parseInt(newVal);
+    }
+  };
+});
+</script></body>
 </html>
