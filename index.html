@@ -1,439 +1,95 @@
 
 <!DOCTYPE html>
-
 <html lang="ko">
 <head>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<style>
-    .main-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-        gap: 10px;
+  <meta charset="UTF-8">
+  <title>배드민턴 코트 배정</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body { font-family: Arial, background: #f0f8ff; padding: 20px; }
+    textarea { width: 100%; height: 100px; margin-bottom: 10px; font-size: 16px; }
+    button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 6px; font-size: 16px; }
+    .name-tag {
+      display: inline-block;
+      padding: 8px;
+      margin: 6px;
+      font-weight: bold;
+      border: 1px solid #333;
+      border-radius: 4px;
+      position: relative;
     }
-    .courts {
-        flex: none;
-        width: 22%;
-        max-width: 22%;
-    }
-    #namePool {
-        flex: none;
-        width: 22%;
-        max-width: 22%;
-    }
-    #assignmentTable {
-        flex: none;
-        width: 50%;
-        max-width: 50%;
-    }
-    @media (max-width: 768px) {
-        .main-container {
-            flex-direction: column !important;
-        }
-        .court, #namePool, #assignmentTable {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .main-container {
-            flex-direction: column !important;
-        }
-        .court, #namePool, #assignmentTable {
-            width: 100% !important;
-        }
-    }
-    
-.badge {
-  position: absolute;
-  top: -6px;
-  left: -6px;
-  background-color: #800020;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2;
-}
-.name-tag {
-  position: relative;
-}
-.sort-btns {
-  display: flex;
-  gap: 5px;
-  margin-bottom: 8px;
-}
-.sort-btns button {
-  background-color: #ff6666;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-}
-</style>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>배드민턴 코트 배정</title>
-<style>
-    .main-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-        gap: 10px;
-    }
-    .courts {
-        flex: none;
-        width: 22%;
-        max-width: 22%;
-    }
-    #namePool {
-        flex: none;
-        width: 22%;
-        max-width: 22%;
-    }
-    #assignmentTable {
-        flex: none;
-        width: 50%;
-        max-width: 50%;
-    }
-    @media (max-width: 768px) {
-        .main-container {
-            flex-direction: column !important;
-        }
-        .court, #namePool, #assignmentTable {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-    }
-    
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 1em;
-      background: #f0f8ff;
-    }
-    h2 { text-align: center; }
-    textarea {
-      width: 100%;
-      height: 100px;
-      margin-bottom: 1em;
-      font-size: 16px;
-    }
-    .btn {
-      width: 100%;
-      padding: 12px;
-      background-color: #007bff;
+    .male { background-color: #cce5ff; border-color: #3399ff; }
+    .female { background-color: #ffd6e8; border-color: #ff66b2; }
+    .badge {
+      position: absolute;
+      top: -5px;
+      left: -5px;
+      background: #800020;
       color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .layout {
-      display: flex;
-      flex-direction: row;
-      height: 100%;
-    }
-    .courts {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 0 0 50%;
-      min-width: 140px;
-    }
-    .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
-
-      background: #fff;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      min-height: 100px;
-      flex-grow: 1;
-    }
-    .column h3 {
+      width: 16px;
+      height: 16px;
+      font-size: 10px;
+      border-radius: 50%;
       text-align: center;
-      margin: 0 0 5px 0;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .reset-btn {
-      background-color: #ff6666;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 12px;
+      line-height: 16px;
       cursor: pointer;
     }
-    .name-tag {
-  width: calc(50% - 10px);
-  display: inline-block;
-  vertical-align: top;
-  box-sizing: border-box;
-  margin: 5px;
-  height: 50px;
-      padding: 8px;
-      margin: 5px 0;
-      border: 1px solid;
-      border-radius: 4px;
-      cursor: grab;
-      text-align: center;
-      user-select: none;
-      font-size: 16px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    .male {
-      background-color: #cce5ff;
-      border-color: #3399ff;
-    }
-    .female {
-      background-color: #ffd6e8;
-      border-color: #ff66b2;
-    }
     #namePool {
-      flex: 0 0 50%;
-      background: #fff;
-      border: 2px solid #ccc;
-      border-radius: 8px;
+      margin-top: 20px;
+      min-height: 150px;
       padding: 10px;
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
     }
-    html, body { height: 100%; }
-    @media (max-width: 768px) {
-      .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
- min-height: 16px !important; }
-      .layout { flex-direction: row; }
-    }
-    .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
- min-height: 80px !important; }
-    .courts { gap: 5px !important; }
   </style>
-<style>
-.name-tag {
-  position: relative;
-  padding-left: 22px;
-}
-.badge {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  background-color: #800020;
-  color: white;
-  font-size: 10px;
-  width: 16px;
-  height: 16px;
-  line-height: 16px;
-  border-radius: 50%;
-  text-align: center;
-  cursor: pointer;
-}
-</style></head>
+</head>
 <body>
-<h2>배드민턴 코트 배정</h2>
-<textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
-<button class="btn" id="generateBtn">이름표 만들기</button>
-<div class="waiting-extra" style="display: flex; gap: 10px; margin-bottom: 20px;">
-<div class="column" id="wait1">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 1</h3>
-<button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
-</div>
-</div>
-</div>
-<div class="column" id="wait2">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 2</h3>
-<button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
-</div>
-</div>
-</div>
-</div>
-<div class="layout">
-<div class="courts">
-<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-btn" onclick="endCourt('court1')">종료</button></div></div>
-<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-btn" onclick="endCourt('court2')">종료</button></div></div>
-<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-btn" onclick="endCourt('court3')">종료</button></div></div>
-<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-btn" onclick="endCourt('court4')">종료</button></div></div>
-</div>
-<div class="column" id="namePool" style="flex-grow: 1; width: 100%; max-width: 100%;">
-<div class="header"><h3>대기</h3><div class="sort-btns" style="margin-left: 10px; display: inline-flex; gap: 5px;"><button onclick="sortNamePool('급수정렬')">급수정렬</button><button onclick="sortNamePool('횟수정렬')">횟수정렬</button></div></div></div>
-</div>
-<script>
-function sortNamePool(type) {
-  const pool = document.getElementById("namePool");
-  const tags = Array.from(pool.querySelectorAll(".name-tag"));
-  tags.sort((a, b) => {
-    if (type === "급수정렬") return a.textContent.localeCompare(b.textContent);
-    if (type === "횟수정렬") {
-      const aCount = parseInt(a.querySelector(".badge")?.textContent || 0);
-      const bCount = parseInt(b.querySelector(".badge")?.textContent || 0);
-      return bCount - aCount;
-    }
-    return 0;
-  });
-  tags.forEach(tag => pool.appendChild(tag));
-}
+  <h2>배드민턴 코트 배정</h2>
+  <textarea id="inputArea" placeholder="예시: kim hyunsoo 3 남"></textarea>
+  <button id="generateBtn">이름표 만들기</button>
+  <div id="namePool"><h3>대기</h3></div>
 
-function endCourt(courtId) {
-  const court = document.getElementById(courtId);
-  const tags = court.querySelectorAll('.name-tag');
-  tags.forEach(tag => {
-    const badge = tag.querySelector(".badge");
-    if (badge) badge.textContent = parseInt(badge.textContent) + 1;
-    else {
-      const newBadge = document.createElement("div");
-      newBadge.className = "badge";
-      newBadge.textContent = "1";
-      newBadge.ondblclick = () => editBadge(newBadge);
-      tag.appendChild(newBadge);
-    }
-    document.getElementById("namePool").appendChild(tag);
-  });
-}
+  <script>
+    function createTags() {
+      const input = document.getElementById("inputArea").value.trim();
+      const namePool = document.getElementById("namePool");
+      const lines = input.split("\n");
 
-function editBadge(badgeEl) {
-  const oldValue = badgeEl.textContent;
-  const input = document.createElement("input");
-  input.type = "number";
-  input.value = oldValue;
-  input.style.width = "20px";
-  badgeEl.textContent = "";
-  badgeEl.appendChild(input);
-  input.focus();
-  const save = () => {
-    const val = parseInt(input.value, 10);
-    if (!isNaN(val)) badgeEl.textContent = val;
-    else badgeEl.textContent = oldValue;
-  };
-  input.onblur = save;
-  input.onkeydown = (e) => { if (e.key === "Enter") save(); };
-}
-</script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.zone').forEach(el => {
-    Sortable.create(el, {
-      group: 'shared',
-      animation: 150,
-      ghostClass: 'dragging'
-    });
-  });
-});
-</script><script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('.zone').forEach(el => {
-    Sortable.create(el, {
-      group: 'shared',
-      animation: 150,
-      ghostClass: 'dragging'
-    });
-  });
+      lines.forEach(line => {
+        const parts = line.trim().split(" ");
+        if (parts.length !== 4) return;
 
-  // Attach all onClick and listeners only after DOM is ready
-  document.querySelectorAll('.reset-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const zone = btn.closest('.zone');
-      if (zone) {
-        const namePool = document.getElementById('namePool');
-        Array.from(zone.querySelectorAll('.name-tag')).forEach(tag => namePool.appendChild(tag));
-      }
-    });
-  });
+        const [first, last, level, gender] = parts;
+        const tag = document.createElement("div");
+        tag.className = "name-tag " + (gender === "남" ? "male" : "female");
+        tag.innerHTML = '<div class="badge" ondblclick="editBadge(this)">0</div>' + first + " " + last + " " + level + "급";
 
-  document.querySelectorAll('.exit-btn').forEach(btn => {
-    btn.addEventListener('click', function() {
-      const zone = btn.closest('.zone');
-      const namePool = document.getElementById('namePool');
-      Array.from(zone.querySelectorAll('.name-tag')).forEach(tag => {
-        const badge = tag.querySelector('.badge');
-        if (badge) badge.textContent = parseInt(badge.textContent || "0") + 1;
+        tag.dataset.level = level;
+        tag.dataset.count = 0;
+
+        tag.oncontextmenu = (e) => { e.preventDefault(); tag.remove(); };
+        tag.ontouchstart = () => { tag.touchTimeout = setTimeout(() => tag.remove(), 800); };
+        tag.ontouchend = () => clearTimeout(tag.touchTimeout);
+
         namePool.appendChild(tag);
       });
-    });
-  });
-});
-</script><script>
-document.addEventListener("DOMContentLoaded", function () {
-  const generateBtn = document.getElementById("generateBtn");
-  const inputArea = document.getElementById("inputArea");
-
-  function createTagsFromTextarea() {
-    const lines = inputArea.value.trim().split("\n");
-
-    lines.forEach(line => {
-      const parts = line.trim().split(" ");
-      if (parts.length !== 4) return;
-      const [first, last, level, gender] = parts;
-      const name = first + " " + last;
-
-      const tag = document.createElement("div");
-      tag.className = "name-tag " + (gender === "남" ? "male" : "female");
-      tag.innerHTML = '<div class="badge" ondblclick="editBadge(this)">0</div>' + name + " " + level + "급";
-
-      tag.dataset.level = level;
-      tag.dataset.count = 0;
-
-      tag.oncontextmenu = (e) => { e.preventDefault(); tag.remove(); };
-      tag.ontouchstart = () => { tag.touchTimeout = setTimeout(() => tag.remove(), 800); };
-      tag.ontouchend = () => clearTimeout(tag.touchTimeout);
-
-      document.getElementById("namePool").appendChild(tag);
-    });
-  }
-
-  generateBtn.addEventListener("click", createTagsFromTextarea);
-  inputArea.addEventListener("keydown", (e) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      createTagsFromTextarea();
     }
-  });
 
-  window.editBadge = function (badge) {
-    const newVal = prompt("숫자를 입력하세요", badge.innerText);
-    if (newVal !== null && !isNaN(parseInt(newVal))) {
-      badge.innerText = parseInt(newVal);
-      badge.parentElement.dataset.count = parseInt(newVal);
+    function editBadge(badge) {
+      const newVal = prompt("횟수를 입력하세요", badge.innerText);
+      if (newVal !== null && !isNaN(parseInt(newVal))) {
+        badge.innerText = parseInt(newVal);
+      }
     }
-  };
-});
-</script></body>
+
+    document.getElementById("generateBtn").addEventListener("click", createTags);
+    document.getElementById("inputArea").addEventListener("keydown", function(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        createTags();
+      }
+    });
+  </script>
+</body>
 </html>
