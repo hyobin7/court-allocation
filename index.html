@@ -157,6 +157,22 @@ body {
   max-width: 100vw;
 }
 </style>
+<!-- Firebase App (the core Firebase SDK) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
+    authDomain: "cock-5c32d.firebaseapp.com",
+    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
+    projectId: "cock-5c32d",
+    storageBucket: "cock-5c32d.appspot.com",
+    messagingSenderId: "639370966543",
+    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
 </head>
 <body>
 <h2>배드민턴 코트 배정</h2>
@@ -326,63 +342,101 @@ function resetAll() {
 }
 </script>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
-    authDomain: "cock-5c32d.firebaseapp.com",
-    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
-    projectId: "cock-5c32d",
-    storageBucket: "cock-5c32d.firebasestorage.app",
-    messagingSenderId: "639370966543",
-    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a",
-    measurementId: "G-FLZSZVBPHC"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-
-  // 이름표 실시간 생성 감지
-  db.ref("nameTags").on("value", (snapshot) => {
-    const namePool = document.getElementById("namePool");
-    namePool.innerHTML = ""; // 기존 삭제
-    const data = snapshot.val();
-    if (data) {
-      Object.keys(data).forEach((key) => {
-        const tag = document.createElement("div");
-        tag.className = "name-tag";
-        tag.textContent = data[key].name;
-        namePool.appendChild(tag);
+function syncZonesToFirebase() {
+  zoneIds.forEach(zoneId => {
+    const zone = document.getElementById(zoneId);
+    const data = [];
+    if (zone) {
+      zone.querySelectorAll(".name-tag").forEach(tag => {
+        data.push({
+          id: tag.dataset.id || tag.textContent,
+          text: tag.childNodes[0]?.textContent?.trim() || "",
+          gender: tag.classList.contains("male") ? "남" : "여",
+          badge: tag.querySelector(".badge")?.textContent || "0"
+        });
       });
+      firebase.database().ref("shared/zones/" + zoneId).set(data);
     }
   });
+}
 
-  // 이름표 생성 시 저장
-  function addNameTagToFirebase(name) {
-    const newKey = db.ref().child("nameTags").push().key;
-    db.ref("nameTags/" + newKey).set({ name: name });
+function loadZonesFromFirebase() {
+  zoneIds.forEach(zoneId => {
+    firebase.database().ref("shared/zones/" + zoneId).on("value", (snapshot) => {
+      const zone = document.getElementById(zoneId);
+      if (zone) {
+        zone.innerHTML = "";
+        const list = snapshot.val();
+        if (list) {
+          list.forEach(item => {
+            const tag = document.createElement("div");
+            tag.className = "name-tag";
+            tag.classList.add(item.gender === "남" ? "male" : "female");
+            tag.textContent = item.text;
+            tag.dataset.id = item.id || item.text;
+
+            const badge = document.createElement("div");
+            badge.className = "badge";
+            badge.textContent = item.badge;
+            badge.ondblclick = (e) => {
+              e.stopPropagation();
+              const newValue = prompt("횟수를 수정하세요:", badge.textContent);
+              if (newValue !== null) {
+                badge.textContent = newValue;
+                syncZonesToFirebase();
+              }
+            };
+            tag.appendChild(badge);
+
+            // 삭제: 우클릭 또는 모바일 오래 누르기
+            tag.oncontextmenu = (e) => {
+              e.preventDefault();
+              tag.remove();
+              syncZonesToFirebase();
+            };
+            tag.ontouchstart = function(e) {
+              tag.touchStartTime = Date.now();
+            };
+            tag.ontouchend = function(e) {
+              if (Date.now() - tag.touchStartTime > 800) {
+                tag.remove();
+                syncZonesToFirebase();
+              }
+            };
+
+            zone.appendChild(tag);
+          });
+        }
+      }
+    });
+  });
+}
+
+// 종료 버튼 클릭 처리 예시 (코트마다 종료 버튼은 id가 'reset-court1' 등이어야 함)
+["court1", "court2", "court3", "court4"].forEach(courtId => {
+  const btn = document.getElementById("reset-" + courtId);
+  if (btn) {
+    btn.onclick = () => {
+      const zone = document.getElementById(courtId);
+      const namePool = document.getElementById("namePool");
+      zone.querySelectorAll(".name-tag").forEach(tag => {
+        const newTag = tag.cloneNode(true);
+        const badge = newTag.querySelector(".badge");
+        badge.textContent = parseInt(badge.textContent || "0") + 1;
+        namePool.appendChild(newTag);
+        tag.remove();
+      });
+      syncZonesToFirebase();
+    };
   }
+});
 
-  // 기존 생성 함수 수정 (예시)
-  window.addEventListener("DOMContentLoaded", () => {
-    const createBtn = document.getElementById("createButton");
-    const input = document.getElementById("nameInput");
-    if (createBtn && input) {
-      createBtn.onclick = () => {
-        const name = input.value.trim().toUpperCase();
-        if (name) {
-          addNameTagToFirebase(name);
-          input.value = "";
-        }
-      };
-      input.addEventListener("keypress", (e) => {
-        if (e.key === "Enter") {
-          createBtn.click();
-        }
-      });
-    }
-  });
+window.addEventListener("load", () => {
+  loadZonesFromFirebase();
+  setInterval(syncZonesToFirebase, 3000);
+});
 </script>
 </body>
 </html>
