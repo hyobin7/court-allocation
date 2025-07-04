@@ -6,6 +6,14 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>배드민턴 코트 배정</title>
+
+<script>
+// Define zone IDs for Firebase sync
+const zoneIds = [
+  "waiting1", "waiting2", "court1", "court2", "court3", "court4", "namePool"
+];
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
 function moveAll(fromId, toId) {
   const from = document.getElementById(fromId);
@@ -341,6 +349,8 @@ function resetAll() {
   });
 }
 </script>
+
+
 <script>
 function syncZonesToFirebase() {
   zoneIds.forEach(zoneId => {
