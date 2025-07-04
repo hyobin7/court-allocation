@@ -3,666 +3,386 @@
 
 <html lang="ko">
 <head>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<style>
-    .main-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-        gap: 10px;
-    }
-    .courts {
-        flex: none;
-        width: 22%;
-        max-width: 22%;
-    }
-    #namePool {
-        flex: none;
-        width: 22%;
-        max-width: 22%;
-    }
-    #assignmentTable {
-        flex: none;
-        width: 50%;
-        max-width: 50%;
-    }
-    @media (max-width: 768px) {
-        .main-container {
-            flex-direction: column !important;
-        }
-        .court, #namePool, #assignmentTable {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .main-container {
-            flex-direction: column !important;
-        }
-        .court, #namePool, #assignmentTable {
-            width: 100% !important;
-        }
-    }
-    
-.badge {
-  position: absolute;
-  top: -6px;
-  left: -6px;
-  background-color: #800020;
-  color: white;
-  font-size: 12px;
-  font-weight: bold;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2;
-}
-.name-tag {
-  position: relative;
-}
-.sort-btns {
-  display: flex;
-  gap: 5px;
-  margin-bottom: 8px;
-}
-.sort-btns button {
-  background-color: #ff6666;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-}
-</style>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>배드민턴 코트 배정</title>
-<style>
-    .main-container {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: nowrap;
-        gap: 10px;
-    }
-    .courts {
-        flex: none;
-        width: 22%;
-        max-width: 22%;
-    }
-    #namePool {
-        flex: none;
-        width: 22%;
-        max-width: 22%;
-    }
-    #assignmentTable {
-        flex: none;
-        width: 50%;
-        max-width: 50%;
-    }
-    @media (max-width: 768px) {
-        .main-container {
-            flex-direction: column !important;
-        }
-        .court, #namePool, #assignmentTable {
-            width: 100% !important;
-            max-width: 100% !important;
-        }
-    }
-    
-    body {
-      font-family: 'Arial', sans-serif;
-      margin: 0;
-      padding: 1em;
-      background: #f0f8ff;
-    }
-    h2 { text-align: center; }
-    textarea {
-      width: 100%;
-      height: 100px;
-      margin-bottom: 1em;
-      font-size: 16px;
-    }
-    .btn {
-      width: 100%;
-      padding: 12px;
-      background-color: #007bff;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      margin-bottom: 20px;
-    }
-    .layout {
-      display: flex;
-      flex-direction: row;
-      height: 100%;
-    }
-    .courts {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      flex: 0 0 50%;
-      min-width: 140px;
-    }
-    .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
+function moveAll(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  from.querySelectorAll('.name-tag').forEach(tag => to.appendChild(tag));
+}
 
-      background: #fff;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      min-height: 100px;
-      flex-grow: 1;
-    }
-    .column h3 {
-      text-align: center;
-      margin: 0 0 5px 0;
-    }
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .reset-btn {
-      background-color: #ff6666;
-      color: white;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 6px;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .name-tag {
-  width: calc(50% - 10px);
-  display: inline-block;
-  vertical-align: top;
-  box-sizing: border-box;
-  margin: 5px;
-  height: 50px;
-      padding: 8px;
-      margin: 5px 0;
-      border: 1px solid;
-      border-radius: 4px;
-      cursor: grab;
-      text-align: center;
-      user-select: none;
-      font-size: 16px;
-      font-weight: bold;
-      text-transform: uppercase;
-    }
-    .male {
-      background-color: #cce5ff;
-      border-color: #3399ff;
-    }
-    .female {
-      background-color: #ffd6e8;
-      border-color: #ff66b2;
-    }
-    #namePool {
-      flex: 0 0 50%;
-      background: #fff;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-      padding: 10px;
-      min-height: 300px;
-      display: flex;
-      flex-direction: column;
-    }
-    html, body { height: 100%; }
-    @media (max-width: 768px) {
-      .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
- min-height: 16px !important; }
-      .layout { flex-direction: row; }
-    }
-    .column {
-  display: flex;
-  flex-wrap: wrap;
-  align-content: flex-start;
- min-height: 80px !important; }
-    .courts { gap: 5px !important; }
-  </style>
+function resetAll() {
+  const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+  ids.forEach(id => {
+    const col = document.getElementById(id);
+    col.querySelectorAll(".name-tag").forEach(tag => tag.remove());
+  });
+}
+</script>
 <style>
-.name-tag {
-  position: relative;
-  padding-left: 22px;
-}
-.badge {
-  position: absolute;
+    body { font-family: Arial, sans-serif; background: #f0f8ff; padding: 1em; }
+    h2 { text-align: center; }
+    textarea { width: 100%; height: 100px; font-size: 16px; margin-bottom: 1em; }
+    .btn { width: 100%; padding: 12px; background-color: #007bff; color: white; font-size: 16px; border: none; border-radius: 8px; margin-bottom: 20px; cursor: pointer; }
+    .layout { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+    .column { background: white; border: 2px solid #ccc; border-radius: 8px; padding: 10px; flex: 1; min-width: 200px; min-height: 150px; position: relative; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .reset-btn { background: #ff6666; color: white; border: none; padding: 4px 8px; border-radius: 5px; font-size: 12px; cursor: pointer; }
+    .name-tag {
+    font-size: 20px;
+    padding: 10px 12px;
+    line-height: 24px;
+    min-height: 32px; display: inline-block; margin: 5px; padding: 8px 10px; border: 2px solid #444; border-radius: 6px; font-size: 14px; font-weight: bold; background: #ffffcc; position: relative; }
+    .male { background-color: #cce5ff; border-color: #3399ff; }
+    .female { background-color: #ffd6e8; border-color: #ff66b2; }
+    .badge {
   top: 2px;
-  left: 2px;
-  background-color: #800020;
-  color: white;
-  font-size: 10px;
-  width: 16px;
-  height: 16px;
-  line-height: 16px;
-  border-radius: 50%;
-  text-align: center;
-  cursor: pointer;
+  left: 4px;
+  transform: translate(-50%, -50%); position: absolute; top: 2px; left: 2px; background: #800020; color: white; font-size: 10px; width: 16px; height: 16px; line-height: 16px; border-radius: 50%; text-align: center; cursor: pointer; }
+    .sort-btns { display: flex; gap: 5px; margin-top: 5px; }
+  
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
 }
-</style></head>
+.header h4 {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.layout > div {
+  flex: 1 0 auto;
+  margin: 5px;
+}
+
+.namepool-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+#namePool {
+  width: 95%;
+}
+
+#wait1, #wait2 {
+  flex: 0 0 12%;
+  min-width: 120px;
+}
+
+#wait2 .sort-btns {
+  flex-wrap: nowrap;
+  flex-direction: row;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  flex-flow: row wrap;
+  gap: 4px;
+}
+#wait2 .sort-btns button {
+  white-space: nowrap;
+}
+
+.name-tag .badge {
+  top: 2px;
+  left: 4px;
+  transform: translate(-50%, -50%);
+    
+    
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  font-size: 12px;
+  padding: 2px 5px;
+  z-index: 10;
+}
+.name-tag {
+    font-size: 20px;
+    padding: 10px 12px;
+    line-height: 24px;
+    min-height: 32px;
+  position: relative;
+  padding-left: 10px;
+  padding-top: 10px;
+}
+
+
+/* Responsive layout for all devices */
+@media screen and (max-width: 768px) {
+  .layout {
+    flex-direction: column !important;
+    align-items: center;
+  }
+
+  .column {
+    width: 90% !important;
+    min-width: unset !important;
+  }
+
+  #namePool {
+    width: 95% !important;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .layout {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .column {
+    flex: 1 0 18%;
+    min-width: 160px;
+  }
+
+  #namePool {
+    width: 95%;
+    margin: auto;
+  }
+}
+
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+</style>
+</head>
 <body>
 <h2>배드민턴 코트 배정</h2>
-<textarea id="inputArea" placeholder="예시: kim hyunsoo 3급 남\nlee jiyeon 2급 여"></textarea>
+<textarea id="inputArea" placeholder="이름 급수 성별 입력"></textarea>
 <button class="btn" id="generateBtn">이름표 만들기</button>
-<div class="waiting-extra" style="display: flex; gap: 10px; margin-bottom: 20px;">
-<div class="column" id="wait1">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 1</h3>
-<button class="reset-btn" onclick="resetToWait('wait1')">리셋</button>
+<div class="layout"><div class="column" id="wait1">
+<div class="header">
+<h4>대기 1</h4><button class="reset-btn" onclick="resetColumn('wait1')">리셋</button>
 </div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait1', 'court4')">4코트</button>
+<div class="sort-btns">
+<button class="reset-btn" onclick="moveAll('wait1','court1')">1코트</button>
+<button class="reset-btn" onclick="moveAll('wait1','court2')">2코트</button>
+<button class="reset-btn" onclick="moveAll('wait1','court3')">3코트</button>
+<button class="reset-btn" onclick="moveAll('wait1','court4')">4코트</button>
 </div>
+</div><div class="column" id="wait2">
+<div class="header">
+<h4>대기 2</h4><button class="reset-btn" onclick="resetColumn('wait2')">리셋</button>
 </div>
+<div class="sort-btns"><button class="reset-btn" onclick="moveAll('wait2','wait1')">대기1</button><button class="reset-btn" onclick="moveAll('wait2','court1')">1코트</button><button class="reset-btn" onclick="moveAll('wait2','court2')">2코트</button><button class="reset-btn" onclick="moveAll('wait2','court3')">3코트</button><button class="reset-btn" onclick="moveAll('wait2','court4')">4코트</button></div>
+</div><div class="column" id="court1"><div class="header"><h4>1코트</h4><button class="reset-btn" onclick="resetColumn('court1')">리셋</button><button class="reset-btn" onclick="endCourt('court1')">종료</button></div></div><div class="column" id="court2"><div class="header"><h4>2코트</h4><button class="reset-btn" onclick="resetColumn('court2')">리셋</button><button class="reset-btn" onclick="endCourt('court2')">종료</button></div></div><div class="column" id="court3"><div class="header"><h4>3코트</h4><button class="reset-btn" onclick="resetColumn('court3')">리셋</button><button class="reset-btn" onclick="endCourt('court3')">종료</button></div></div><div class="column" id="court4"><div class="header"><h4>4코트</h4><button class="reset-btn" onclick="resetColumn('court4')">리셋</button><button class="reset-btn" onclick="endCourt('court4')">종료</button></div></div></div><div class="namepool-row"><div class="column" id="namePool">
+<div class="header"><h4>대기</h4></div>
+<div class="sort-btns">
+<button class="reset-btn" onclick="resetAll()">초기화</button>
+<button class="reset-btn" onclick="sortNamePool('급수정렬')">급수정렬</button>
+<button class="reset-btn" onclick="sortNamePool('횟수정렬')">횟수정렬</button>
 </div>
-<div class="column" id="wait2">
-<div class="header" style="flex-direction: column; align-items: flex-start;">
-<div style="display: flex; flex-wrap: wrap; gap: 6px; align-items: center;">
-<h3 style="margin: 0;">대기 2</h3>
-<button class="reset-btn" onclick="resetToWait('wait2')">리셋</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'wait1')">대기1</button>
-</div>
-<div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;">
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court1')">1코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court2')">2코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court3')">3코트</button>
-<button class="reset-btn" onclick="moveAllToCourt('wait2', 'court4')">4코트</button>
-</div>
-</div>
-</div>
-</div>
-<div class="layout">
-<div class="courts">
-<div class="column" id="court1"><div class="header"><h3>1코트</h3><button class="reset-btn" onclick="resetCourt('court1')">리셋</button><button class="reset-btn" onclick="endCourt('court1')">종료</button></div></div>
-<div class="column" id="court2"><div class="header"><h3>2코트</h3><button class="reset-btn" onclick="resetCourt('court2')">리셋</button><button class="reset-btn" onclick="endCourt('court2')">종료</button></div></div>
-<div class="column" id="court3"><div class="header"><h3>3코트</h3><button class="reset-btn" onclick="resetCourt('court3')">리셋</button><button class="reset-btn" onclick="endCourt('court3')">종료</button></div></div>
-<div class="column" id="court4"><div class="header"><h3>4코트</h3><button class="reset-btn" onclick="resetCourt('court4')">리셋</button><button class="reset-btn" onclick="endCourt('court4')">종료</button></div></div>
-</div>
-<div class="column" id="namePool" style="flex-grow: 1; width: 100%; max-width: 100%;">
-<div class="header"><h3>대기</h3><div class="sort-btns" style="margin-left: 10px; display: inline-flex; gap: 5px;"><button onclick="sortNamePool('급수정렬')">급수정렬</button><button onclick="sortNamePool('횟수정렬')">횟수정렬</button></div></div></div>
-</div>
+</div></div>
+<script>
+    function createTag(key, data) {
+      const tag = document.createElement("div");
+      tag.className = "name-tag";
+      tag.dataset.key = key;
+      tag.textContent = data.name + " " + data.level;
+      tag.classList.add(data.gender === "남" ? "male" : "female");
 
+      const badge = document.createElement("div");
+      badge.className = "badge";
+      badge.textContent = "0";
+      badge.ondblclick = () => editBadge(badge);
+      tag.appendChild(badge);
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js">
-window.onload = () => {
-  document.getElementById("generateBtn").onclick = generateTags;
-  document.getElementById("inputArea").addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      generateTags();
+      tag.addEventListener("contextmenu", e => {
+        e.preventDefault();
+        tag.remove();
+      });
+
+      tag.addEventListener("touchend", function(e) {
+        if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
+          tag.dataset.lastTouch = Date.now();
+        } else {
+          tag.remove();
+          tag.dataset.lastTouch = 0;
+        }
+      });
+
+      return tag;
     }
-  });
-};
-</script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
+    function generateTags() {
+      const input = document.getElementById("inputArea").value.trim();
+      const lines = input.split("\n");
+      lines.forEach(line => {
+        const parts = line.trim().split(" ");
+        if (parts.length >= 3) {
+          const name = parts[0];
+          const level = parts[1];
+          const gender = parts[2];
+          const tag = createTag(name + Date.now(), { name: name.toUpperCase(), level: level.toUpperCase(), gender: gender.toUpperCase() });
+          document.getElementById("namePool").appendChild(tag);
+        }
+      });
+      document.getElementById("inputArea").value = "";
     }
-  });
 
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
+    function editBadge(badgeEl) {
+      const oldValue = badgeEl.textContent;
       const input = document.createElement("input");
       input.type = "number";
       input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
+      input.style.width = "20px";
+      badgeEl.textContent = "";
+      badgeEl.appendChild(input);
       input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
+      input.onblur = () => {
+        const val = parseInt(input.value, 10);
+        badgeEl.textContent = isNaN(val) ? oldValue : val;
       };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script><script>
-
-
-
-
-function generateTags() {
-  const input = document.getElementById("inputArea").value.trim();
-  const lines = input.split("
-");
-  lines.forEach(line => {
-    const parts = line.trim().split(" ");
-    if (parts.length >= 3) {
-      const name = parts[0].toUpperCase();
-      const level = parts[1];
-      const gender = parts[2];
-      const tag = createTag(name + Date.now(), { name, level, gender });
-      document.getElementById("namePool").appendChild(tag);
+      input.onkeydown = (e) => { if (e.key === "Enter") input.blur(); };
     }
-  });
-  document.getElementById("inputArea").value = "";
-}
 
-  });
-  document.getElementById("inputArea").value = "";
-}
-
-
-
-function createTag(key, data) {
-  const tag = document.createElement("div");
-  tag.className = "name-tag";
-  tag.dataset.key = key;
-  tag.textContent = `${data.name} ${data.level}`.toUpperCase();
-  tag.classList.add(data.gender === "남" ? "male" : "female");
-
-  // Badge placeholder
-  const badge = document.createElement("div");
-  badge.className = "badge";
-  badge.textContent = "0";
-  badge.ondblclick = () => editBadge(badge);
-  tag.appendChild(badge);
-
-  // Right-click delete
-  tag.addEventListener("contextmenu", e => {
-    e.preventDefault();
-    if (confirm("이 이름표를 삭제할까요?")) {
-      tag.remove();
-    }
-  });
-
-  // Long-press delete (mobile)
-  tag.addEventListener("touchend", function(e) {
-    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
-      tag.dataset.lastTouch = Date.now();
-    } else {
-      tag.remove();
-      tag.dataset.lastTouch = 0;
-    }
-  });
-
-  return tag;
-}
- ${data.level}`.toUpperCase();
-  tag.classList.add(data.gender === "남" ? "male" : "female");
-
-  tag.addEventListener("contextmenu", e => {
-    e.preventDefault();
-    if (confirm("이 이름표를 삭제할까요?")) {
-      tag.remove();
-    }
-  });
-
-  tag.addEventListener("touchend", function(e) {
-    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
-      tag.dataset.lastTouch = Date.now();
-    } else {
-      tag.remove();
-      tag.dataset.lastTouch = 0;
-    }
-  });
-
-  return tag;
-}
- ${data.level}`.toUpperCase();
-  tag.classList.add(data.gender === "남" ? "male" : "female");
-  tag.addEventListener("contextmenu", e => {
-    e.preventDefault();
-    if (confirm("이 이름표를 삭제할까요?")) {
-      
-    }
-  });
-  tag.addEventListener("touchend", function(e) {
-    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
-      tag.dataset.lastTouch = Date.now();
-    } else {
-      
-      tag.dataset.lastTouch = 0;
-    }
-  });
-  return tag;
-}
-
-function resetCourt(courtId) {
-  Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.parentElement.id === courtId) {
-      
-    }
-  });
-}
-
-function resetToWait(waitId) {
-  Object.entries(tagRefs).forEach(([key, el]) => {
-    if (el.parentElement.id === waitId) {
-      
-    }
-  });
-}
-
-
-function moveAllToCourt(fromId, toId) {
-  const fromEl = document.getElementById(fromId);
-  const tags = fromEl.querySelectorAll('.name-tag');
-  tags.forEach(tag => {
     
-  });
-}
-
-
-["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"].forEach(id => {
-  
-      if (["court1","court2","court3","court4"].includes(court)) updateCount(evt.item.textContent.split(" ")[0]);
-    }
-  });
-});
-
-
-  const tag = createTag(key, data);
-  tagRefs[key] = tag;
-  document.getElementById(data.court || "namePool").appendChild(tag);
-});
-
- tag.remove();
-  delete tagRefs[snap.key];
-});
-
-
-  const tag = tagRefs[key];
-  if (tag) document.getElementById(data.court || "namePool").appendChild(tag);
-});
-
-window.onload = () => {
-  document.getElementById("generateBtn").onclick = generateTags;
-  document.getElementById("inputArea").addEventListener("keydown", e => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      generateTags();
-    }
-  });
-};
-
-let countMap = {};
-let sortKey = 'name';
-let sortAsc = true;
-
-function updateCount(name) {
-  if (!countMap[name]) countMap[name] = 0;
-  countMap[name]++;
-  renderTable();
-}
-
-function renderTable() {
-  const tableBody = document.getElementById("statsTableBody");
-  tableBody.innerHTML = "";
-
-  const entries = Object.entries(countMap);
-  entries.sort((a, b) => {
-    if (sortKey === 'name') {
-      return sortAsc ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]);
-    } else {
-      return sortAsc ? a[1] - b[1] : b[1] - a[1];
-    }
-  });
-
-  for (const [name, count] of entries) {
-    const row = document.createElement("tr");
-    const tdName = document.createElement("td");
-    tdName.textContent = name;
-    const tdCount = document.createElement("td");
-    tdCount.textContent = count;
-    tdCount.ondblclick = function () {
-      const oldValue = count;
-      const input = document.createElement("input");
-      input.type = "number";
-      input.value = oldValue;
-      input.style.width = "60px";
-      this.innerHTML = "";
-      this.appendChild(input);
-      input.focus();
-      const save = () => {
-        const newVal = parseInt(input.value, 10);
-        if (!isNaN(newVal)) {
-          countMap[name] = newVal;
-          renderTable();
-        } else {
-          input.value = oldValue;
-          renderTable();
-        }
-      };
-      input.onblur = save;
-      input.onkeydown = (e) => {
-        if (e.key === "Enter") save();
-      };
-    };
-    row.appendChild(tdName);
-    row.appendChild(tdCount);
-    tableBody.appendChild(row);
-  }
-}
-
-document.getElementById("thName").onclick = () => {
-  sortKey = "name";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-document.getElementById("thCount").onclick = () => {
-  sortKey = "count";
-  sortAsc = !sortAsc;
-  renderTable();
-};
-
-</script><script>
-function sortNamePool(type) {
+function resetColumn(id) {
+  const col = document.getElementById(id);
   const pool = document.getElementById("namePool");
-  const tags = Array.from(pool.querySelectorAll(".name-tag"));
-  tags.sort((a, b) => {
-    if (type === "급수정렬") return a.textContent.localeCompare(b.textContent);
-    if (type === "횟수정렬") {
-      const aCount = parseInt(a.querySelector(".badge")?.textContent || 0);
-      const bCount = parseInt(b.querySelector(".badge")?.textContent || 0);
-      return bCount - aCount;
-    }
-    return 0;
-  });
-  tags.forEach(tag => pool.appendChild(tag));
+  col.querySelectorAll(".name-tag").forEach(tag => pool.appendChild(tag));
 }
 
 
-function endCourt(courtId) {
-  const court = document.getElementById(courtId);
-  const tags = court.querySelectorAll('.name-tag');
-  tags.forEach(tag => {
-    const badge = tag.querySelector(".badge");
-    if (badge) badge.textContent = parseInt(badge.textContent) + 1;
-    else {
-      const newBadge = document.createElement("div");
-      newBadge.className = "badge";
-      newBadge.textContent = "1";
-      newBadge.ondblclick = () => editBadge(newBadge);
-      tag.appendChild(newBadge);
+    function endCourt(id) {
+      const col = document.getElementById(id);
+      const tags = col.querySelectorAll(".name-tag");
+      tags.forEach(tag => {
+        const badge = tag.querySelector(".badge");
+        if (badge) badge.textContent = parseInt(badge.textContent) + 1;
+        else {
+          const newBadge = document.createElement("div");
+          newBadge.className = "badge";
+          newBadge.textContent = "1";
+          newBadge.ondblclick = () => editBadge(newBadge);
+          tag.appendChild(newBadge);
+        }
+        document.getElementById("namePool").appendChild(tag);
+      });
     }
-    
-  });
+
+    function sortNamePool(type) {
+      const pool = document.getElementById("namePool");
+      const tags = Array.from(pool.querySelectorAll(".name-tag"));
+      tags.sort((a, b) => {
+        if (type === "급수정렬") {
+      const order = { "S": 0, "A": 1, "B": 2, "C": 3, "D": 4 };
+      const aLevel = a.textContent.trim().split(" ")[1].charAt(0).toUpperCase();
+      const bLevel = b.textContent.trim().split(" ")[1].charAt(0).toUpperCase();
+      return (order[aLevel] ?? 99) - (order[bLevel] ?? 99);
+    }
+        if (type === "횟수정렬") {
+          const aCount = parseInt(a.querySelector(".badge")?.textContent || 0);
+          const bCount = parseInt(b.querySelector(".badge")?.textContent || 0);
+          return aCount - bCount;
+        }
+        return 0;
+      });
+      tags.forEach(tag => pool.appendChild(tag));
+    }
+
+    window.onload = () => {
+      document.getElementById("generateBtn").onclick = generateTags;
+      document.getElementById("inputArea").addEventListener("keydown", e => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          generateTags();
+        }
+      });
+
+      const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+      ids.forEach(id => {
+        new Sortable(document.getElementById(id), {
+          group: "shared",
+          animation: 150
+        });
+      });
+    };
+  
+function moveAll(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  from.querySelectorAll('.name-tag').forEach(tag => to.appendChild(tag));
 }
 
+function resetAll() {
+  const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+  ids.forEach(id => {
+    const col = document.getElementById(id);
+    col.querySelectorAll(".name-tag").forEach(tag => tag.remove());
+  });
+}
+</script>
 
-function editBadge(badgeEl) {
-  const oldValue = badgeEl.textContent;
-  const input = document.createElement("input");
-  input.type = "number";
-  input.value = oldValue;
-  input.style.width = "20px";
-  badgeEl.textContent = "";
-  badgeEl.appendChild(input);
-  input.focus();
-  const save = () => {
-    const val = parseInt(input.value, 10);
-    if (!isNaN(val)) badgeEl.textContent = val;
-    else badgeEl.textContent = oldValue;
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
+    authDomain: "cock-5c32d.firebaseapp.com",
+    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
+    projectId: "cock-5c32d",
+    storageBucket: "cock-5c32d.firebasestorage.app",
+    messagingSenderId: "639370966543",
+    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a",
+    measurementId: "G-FLZSZVBPHC"
   };
-  input.onblur = save;
-  input.onkeydown = (e) => { if (e.key === "Enter") save(); };
-}
-</script></body>
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // 이름표 실시간 생성 감지
+  db.ref("nameTags").on("value", (snapshot) => {
+    const namePool = document.getElementById("namePool");
+    namePool.innerHTML = ""; // 기존 삭제
+    const data = snapshot.val();
+    if (data) {
+      Object.keys(data).forEach((key) => {
+        const tag = document.createElement("div");
+        tag.className = "name-tag";
+        tag.textContent = data[key].name;
+        namePool.appendChild(tag);
+      });
+    }
+  });
+
+  // 이름표 생성 시 저장
+  function addNameTagToFirebase(name) {
+    const newKey = db.ref().child("nameTags").push().key;
+    db.ref("nameTags/" + newKey).set({ name: name });
+  }
+
+  // 기존 생성 함수 수정 (예시)
+  window.addEventListener("DOMContentLoaded", () => {
+    const createBtn = document.getElementById("createButton");
+    const input = document.getElementById("nameInput");
+    if (createBtn && input) {
+      createBtn.onclick = () => {
+        const name = input.value.trim().toUpperCase();
+        if (name) {
+          addNameTagToFirebase(name);
+          input.value = "";
+        }
+      };
+      input.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+          createBtn.click();
+        }
+      });
+    }
+  });
+</script>
+</body>
 </html>
