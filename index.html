@@ -411,7 +411,7 @@ function resetAll() {
     const nameTags = document.querySelectorAll(".name-tag");
     const data = {};
     nameTags.forEach(tag => {
-      const id = tag.dataset.id || btoa(tag.innerText.trim());
+      const id = btoa((tag.dataset.id || tag.innerText).trim());
       data[id] = {
         html: tag.outerHTML,
         parentId: tag.parentElement.id || null
