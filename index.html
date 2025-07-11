@@ -441,8 +441,12 @@ function resetAll() {
   window.addEventListener("resize", applyBodyZoomAndFit);
   window.addEventListener("load", applyBodyZoomAndFit);
 </script>
-
 <!-- Firebase compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+
+<!-- Firebase compat SDK with fix -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script>
@@ -483,9 +487,20 @@ function resetAll() {
       ids.forEach(id => {
         const col = document.getElementById(id);
         if (!col) return;
-        const header = col.querySelector(".header");
+
+        // Preserve existing buttons/headers
+        const children = Array.from(col.children);
+        const preserved = children.filter(el =>
+          !el.classList.contains("name-tag")
+        );
+
+        // Remove all content first
         col.innerHTML = "";
-        if (header) col.appendChild(header);
+
+        // Re-append preserved buttons/headers
+        preserved.forEach(p => col.appendChild(p));
+
+        // Append synced name tags
         (data[id] || []).forEach(item => {
           const wrapper = document.createElement("div");
           wrapper.innerHTML = item.html;
@@ -520,13 +535,22 @@ function resetAll() {
     }
   }
 
-  const observer = new MutationObserver(() => saveToFirebase());
   window.addEventListener("load", () => {
     listenFromFirebase();
     const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
     ids.forEach(id => {
       const col = document.getElementById(id);
-      if (col) observer.observe(col, { childList: true, subtree: true });
+      if (!col) return;
+      const config = { childList: true, subtree: true };
+      const observer = new MutationObserver(mutations => {
+        const onlyNameTagChanges = mutations.every(m => 
+          Array.from(m.addedNodes).concat(Array.from(m.removedNodes)).every(n =>
+            n.nodeType === 1 && n.classList.contains("name-tag")
+          )
+        );
+        if (onlyNameTagChanges) saveToFirebase();
+      });
+      observer.observe(col, config);
     });
   });
 </script>
