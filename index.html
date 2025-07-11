@@ -232,13 +232,6 @@ function resetAll() {
   }
 }
 </style>
-
-<script src="https://unpkg.com/mobile-drag-drop/default-ghost-image.min.js"></script>
-<script>
-  MobileDragDrop.polyfill({
-    forceApply: true
-  });
-</script>
 </head>
 <body>
 <h2>배드민턴 코트 배정</h2>
@@ -448,118 +441,44 @@ function resetAll() {
   window.addEventListener("resize", applyBodyZoomAndFit);
   window.addEventListener("load", applyBodyZoomAndFit);
 </script>
-<!-- Firebase compat SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 
-
-<!-- Firebase compat SDK with fix -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
-    authDomain: "cock-5c32d.firebaseapp.com",
-    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
-    projectId: "cock-5c32d",
-    storageBucket: "cock-5c32d.appspot.com",
-    messagingSenderId: "639370966543",
-    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a",
-    measurementId: "G-FLZSZVBPHC"
-  };
+document.addEventListener("DOMContentLoaded", function () {
+  let draggedItem = null;
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+  function enableMobileDragAndDrop() {
+    const draggables = document.querySelectorAll(".name-label");
+    const containers = document.querySelectorAll(".dropzone");
 
-  function saveToFirebase() {
-    const layout = {};
-    const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
-    ids.forEach(id => {
-      const col = document.getElementById(id);
-      layout[id] = [];
-      col.querySelectorAll(".name-tag").forEach(tag => {
-        layout[id].push({
-          html: tag.outerHTML
-        });
+    draggables.forEach(item => {
+      item.addEventListener("touchstart", (e) => {
+        draggedItem = item;
+        item.style.opacity = "0.5";
+      });
+
+      item.addEventListener("touchend", (e) => {
+        item.style.opacity = "1";
+        draggedItem = null;
       });
     });
-    db.ref("/courtLayout").set(layout);
-  }
 
-  function listenFromFirebase() {
-    db.ref("/courtLayout").on("value", snapshot => {
-      const data = snapshot.val();
-      if (!data) return;
-      const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
-      ids.forEach(id => {
-        const col = document.getElementById(id);
-        if (!col) return;
+    containers.forEach(container => {
+      container.addEventListener("touchmove", (e) => {
+        e.preventDefault();
+      });
 
-        // Preserve existing buttons/headers
-        const children = Array.from(col.children);
-        const preserved = children.filter(el =>
-          !el.classList.contains("name-tag")
-        );
-
-        // Remove all content first
-        col.innerHTML = "";
-
-        // Re-append preserved buttons/headers
-        preserved.forEach(p => col.appendChild(p));
-
-        // Append synced name tags
-        (data[id] || []).forEach(item => {
-          const wrapper = document.createElement("div");
-          wrapper.innerHTML = item.html;
-          const tag = wrapper.firstChild;
-          if (tag) {
-            addNameTagListeners(tag);
-            col.appendChild(tag);
-          }
-        });
+      container.addEventListener("touchend", (e) => {
+        if (draggedItem) {
+          container.appendChild(draggedItem);
+          draggedItem = null;
+        }
       });
     });
   }
 
-  function addNameTagListeners(tag) {
-    tag.addEventListener("contextmenu", e => {
-      e.preventDefault();
-      tag.remove();
-      saveToFirebase();
-    });
-    tag.addEventListener("touchend", function(e) {
-      if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
-        tag.dataset.lastTouch = Date.now();
-      } else {
-        tag.remove();
-        tag.dataset.lastTouch = 0;
-        saveToFirebase();
-      }
-    });
-    const badge = tag.querySelector(".badge");
-    if (badge) {
-      badge.ondblclick = () => editBadge(badge);
-    }
-  }
-
-  window.addEventListener("load", () => {
-    listenFromFirebase();
-    const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
-    ids.forEach(id => {
-      const col = document.getElementById(id);
-      if (!col) return;
-      const config = { childList: true, subtree: true };
-      const observer = new MutationObserver(mutations => {
-        const onlyNameTagChanges = mutations.every(m => 
-          Array.from(m.addedNodes).concat(Array.from(m.removedNodes)).every(n =>
-            n.nodeType === 1 && n.classList.contains("name-tag")
-          )
-        );
-        if (onlyNameTagChanges) saveToFirebase();
-      });
-      observer.observe(col, config);
-    });
-  });
+  enableMobileDragAndDrop();
+});
 </script>
+
 </body>
 </html>
