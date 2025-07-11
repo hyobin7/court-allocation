@@ -232,7 +232,6 @@ function resetAll() {
   }
 }
 </style>
-
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
@@ -499,8 +498,9 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 </script>
 
+
 <script>
-// 전체 레이아웃 데이터를 Firebase에 저장
+// 이름표 저장
 function saveToFirebase() {
   const layout = {};
   document.querySelectorAll(".column").forEach(col => {
@@ -518,7 +518,7 @@ function saveToFirebase() {
   firebase.database().ref("layout").set(layout);
 }
 
-// Firebase에서 데이터 받아서 반영
+// 불러오기
 function listenFromFirebase() {
   firebase.database().ref("layout").on("value", (snapshot) => {
     const data = snapshot.val();
@@ -546,11 +546,39 @@ function listenFromFirebase() {
           col.appendChild(tag);
         });
       }
-      initializeDragAndDrop(); // 이름표에 다시 드래그 이벤트 바인딩
+      initializeDragAndDrop(); // 이벤트 바인딩 재적용
     }
   });
 }
-</script>
 
+document.addEventListener("DOMContentLoaded", () => {
+  listenFromFirebase();
+
+  // 이름표 생성 시 저장
+  const createButton = document.getElementById("createBtn");
+  if (createButton) {
+    createButton.addEventListener("click", () => {
+      setTimeout(saveToFirebase, 200); // 생성 직후 저장
+    });
+  }
+
+  // 드래그 후 저장
+  document.addEventListener("drop", () => {
+    setTimeout(saveToFirebase, 300);
+  });
+
+  // 버튼 클릭 시 저장
+  document.body.addEventListener("click", (e) => {
+    if (
+      e.target.matches(".delete") ||
+      e.target.matches(".reset-btn") ||
+      e.target.matches(".exit-btn") ||
+      e.target.matches(".sort-btn")
+    ) {
+      setTimeout(saveToFirebase, 300);
+    }
+  });
+});
+</script>
 </body>
 </html>
