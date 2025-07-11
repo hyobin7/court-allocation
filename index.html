@@ -500,7 +500,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 <script>
-// 이름표 저장
 function saveToFirebase() {
   const layout = {};
   document.querySelectorAll(".column").forEach(col => {
@@ -508,21 +507,25 @@ function saveToFirebase() {
     layout[id] = [];
     col.querySelectorAll(".name-label").forEach(tag => {
       layout[id].push({
-        name: tag.querySelector(".name").innerText,
-        grade: tag.querySelector(".grade").innerText,
+        name: tag.querySelector(".name")?.innerText || "",
+        grade: tag.querySelector(".grade")?.innerText || "",
         gender: tag.dataset.gender || "",
         count: tag.dataset.count || "0"
       });
     });
   });
-  firebase.database().ref("layout").set(layout);
+  firebase.database().ref("layout").set(layout).then(() => {
+    console.log("✅ Saved to Firebase:", layout);
+  }).catch((error) => {
+    console.error("❌ Save failed:", error);
+  });
 }
 
-// 불러오기
 function listenFromFirebase() {
   firebase.database().ref("layout").on("value", (snapshot) => {
     const data = snapshot.val();
     if (data) {
+      console.log("✅ Received from Firebase:", data);
       for (const id in data) {
         const col = document.getElementById(id);
         if (!col) continue;
@@ -546,7 +549,7 @@ function listenFromFirebase() {
           col.appendChild(tag);
         });
       }
-      initializeDragAndDrop(); // 이벤트 바인딩 재적용
+      initializeDragAndDrop();
     }
   });
 }
@@ -554,20 +557,17 @@ function listenFromFirebase() {
 document.addEventListener("DOMContentLoaded", () => {
   listenFromFirebase();
 
-  // 이름표 생성 시 저장
-  const createButton = document.getElementById("createBtn");
-  if (createButton) {
-    createButton.addEventListener("click", () => {
-      setTimeout(saveToFirebase, 200); // 생성 직후 저장
+  const createBtn = document.getElementById("createBtn");
+  if (createBtn) {
+    createBtn.addEventListener("click", () => {
+      setTimeout(saveToFirebase, 500);
     });
   }
 
-  // 드래그 후 저장
   document.addEventListener("drop", () => {
-    setTimeout(saveToFirebase, 300);
+    setTimeout(saveToFirebase, 500);
   });
 
-  // 버튼 클릭 시 저장
   document.body.addEventListener("click", (e) => {
     if (
       e.target.matches(".delete") ||
@@ -575,9 +575,11 @@ document.addEventListener("DOMContentLoaded", () => {
       e.target.matches(".exit-btn") ||
       e.target.matches(".sort-btn")
     ) {
-      setTimeout(saveToFirebase, 300);
+      setTimeout(saveToFirebase, 500);
     }
   });
+
+  console.log("✅ Firebase sync listeners initialized.");
 });
 </script>
 </body>
