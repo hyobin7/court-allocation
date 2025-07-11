@@ -232,6 +232,26 @@ function resetAll() {
   }
 }
 </style>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
+    authDomain: "cock-5c32d.firebaseapp.com",
+    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
+    projectId: "cock-5c32d",
+    storageBucket: "cock-5c32d.firebasestorage.app",
+    messagingSenderId: "639370966543",
+    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a",
+    measurementId: "G-FLZSZVBPHC"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  firebase.analytics();
+  const db = firebase.database();
+</script>
 </head>
 <body>
 <h2>배드민턴 코트 배정</h2>
@@ -441,7 +461,6 @@ function resetAll() {
   window.addEventListener("resize", applyBodyZoomAndFit);
   window.addEventListener("load", applyBodyZoomAndFit);
 </script>
-
 <script>
 document.addEventListener("DOMContentLoaded", function () {
   let draggedItem = null;
@@ -478,6 +497,59 @@ document.addEventListener("DOMContentLoaded", function () {
 
   enableMobileDragAndDrop();
 });
+</script>
+
+<script>
+// 전체 레이아웃 데이터를 Firebase에 저장
+function saveToFirebase() {
+  const layout = {};
+  document.querySelectorAll(".column").forEach(col => {
+    const id = col.id;
+    layout[id] = [];
+    col.querySelectorAll(".name-label").forEach(tag => {
+      layout[id].push({
+        name: tag.querySelector(".name").innerText,
+        grade: tag.querySelector(".grade").innerText,
+        gender: tag.dataset.gender || "",
+        count: tag.dataset.count || "0"
+      });
+    });
+  });
+  firebase.database().ref("layout").set(layout);
+}
+
+// Firebase에서 데이터 받아서 반영
+function listenFromFirebase() {
+  firebase.database().ref("layout").on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (data) {
+      for (const id in data) {
+        const col = document.getElementById(id);
+        if (!col) continue;
+        const header = col.querySelector(".header");
+        const controls = col.querySelector(".control");
+        col.innerHTML = "";
+        if (header) col.appendChild(header);
+        if (controls) col.appendChild(controls);
+        data[id].forEach(item => {
+          const tag = document.createElement("div");
+          tag.className = "name-label";
+          tag.draggable = true;
+          tag.dataset.gender = item.gender;
+          tag.dataset.count = item.count || "0";
+          tag.innerHTML = `
+            <span class="name">${item.name}</span>
+            <span class="grade">${item.grade}</span>
+            <span class="badge">${item.count || "0"}</span>
+            <button class="delete">X</button>
+          `;
+          col.appendChild(tag);
+        });
+      }
+      initializeDragAndDrop(); // 이름표에 다시 드래그 이벤트 바인딩
+    }
+  });
+}
 </script>
 
 </body>
