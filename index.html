@@ -3,13 +3,26 @@
 
 <html lang="ko">
 <head>
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>배드민턴 코트 배정</title>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
+    authDomain: "cock-5c32d.firebaseapp.com",
+    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
+    projectId: "cock-5c32d",
+    storageBucket: "cock-5c32d.appspot.com",
+    messagingSenderId: "639370966543",
+    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a",
+    measurementId: "G-FLZSZVBPHC"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
 function moveAll(fromId, toId) {
   const from = document.getElementById(fromId);
@@ -98,18 +111,13 @@ function resetAll() {
 }
 
 #wait1, #wait2 {
-  flex: 0 0 12%;
-  min-width: 120px;
+  flex: 0 0 16%;
+  min-width: 180px;
 }
-
 #wait2 .sort-btns {
-  flex-wrap: nowrap;
-  flex-direction: row;
-  flex: 1;
   display: flex;
-  justify-content: center;
-  flex-flow: row wrap;
-  gap: 4px;
+  gap: 5px;
+  margin-top: 5px;
 }
 #wait2 .sort-btns button {
   white-space: nowrap;
@@ -147,70 +155,100 @@ function resetAll() {
 }
 
 
-
-
-@media screen and (orientation: landscape) and (max-width: 1024px) {
+/* 모바일/패드: 1~4코트는 한 줄, 그 아래 대기1/2 한 줄 */
+@media screen and (max-width: 1024px) {
   .layout {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    flex-direction: row !important;
-    justify-content: space-between !important;
-    align-items: stretch !important;
-    gap: 0 !important;
+    flex-wrap: wrap;
   }
 
-  /* 대기1, 대기2는 반씩 */
-  #wait1, #wait2 {
-    flex: 0 0 50% !important;
-    max-width: 50% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-    padding: 5px !important;
-  }
-
-  /* 코트 1~4는 25%씩 */
   #court1, #court2, #court3, #court4 {
-    flex: 0 0 25% !important;
-    max-width: 25% !important;
-    min-width: 0 !important;
-    box-sizing: border-box !important;
-    margin: 0 !important;
-    padding: 5px !important;
+    order: 1;
+    flex: 1 1 23%;
+    min-width: 23%;
   }
 
-  .column {
-    min-height: 140px !important;
+  #wait1, #wait2 {
+    order: 2;
+    flex: 1 1 48%;
+    min-width: 48%;
   }
+}
 
-  .sort-btns {
-    flex-wrap: nowrap !important;
+
+/* 모바일에서 코트/대기 줄 구분 */
+@media screen and (max-width: 1024px) {
+  .mobile-court-row, .mobile-wait-row {
+    display: flex;
+    flex-wrap: nowrap;
+    width: 100%;
     justify-content: space-between;
   }
 
-  #namePool {
-    width: 100% !important;
-    margin-top: 10px;
+  .mobile-court-row > div {
+    flex: 0 0 24%;
+    min-width: 24%;
+  }
+
+  .mobile-wait-row > div {
+    flex: 0 0 49%;
+    min-width: 49%;
+  }
+}
+
+
+/* 기본: 모바일 전용 row 숨기기, 기존 구조 유지 */
+.mobile-court-row,
+.mobile-wait-row {
+  display: none;
+}
+
+/* 모바일 전용: 줄 구분 구조 적용 */
+@media screen and (max-width: 1024px) {
+  .layout > #court1,
+  .layout > #court2,
+  .layout > #court3,
+  .layout > #court4,
+  .layout > #wait1,
+  .layout > #wait2 {
+    display: none !important;
+  }
+
+  .mobile-court-row,
+  .mobile-wait-row {
+    display: flex !important;
+    flex-wrap: nowrap;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .mobile-court-row > div {
+    flex: 0 0 24%;
+    min-width: 24%;
+  }
+
+  .mobile-wait-row > div {
+    flex: 0 0 49%;
+    min-width: 49%;
+  }
+
+  /* 버튼이 칸 밖으로 나가지 않도록 보정 */
+  .mobile-court-row .sort-btns,
+  .mobile-wait-row .sort-btns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .mobile-court-row .sort-btns button,
+  .mobile-wait-row .sort-btns button {
+    max-width: 100%;
+    font-size: 14px;
+    padding: 4px 6px;
+    box-sizing: border-box;
   }
 }
 </style>
-<!-- Firebase App (필수) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<!-- Firebase Realtime Database -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
-    authDomain: "cock-5c32d.firebaseapp.com",
-    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
-    projectId: "cock-5c32d",
-    storageBucket: "cock-5c32d.appspot.com",
-    messagingSenderId: "639370966543",
-    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a"
-  };
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-</script>
 </head>
 <body>
 <h2>배드민턴 코트 배정</h2>
@@ -231,7 +269,22 @@ function resetAll() {
 <h4 style="font-size: 24px;">대기 2</h4><button class="reset-btn" onclick="resetColumn('wait2')" style="font-size: 18px;">리셋</button>
 </div>
 <div class="sort-btns"><button class="reset-btn" onclick="moveAll('wait2','wait1')" style="font-size: 18px;">대기1</button><button class="reset-btn" onclick="moveAll('wait2','court1')" style="font-size: 18px;">1코트</button><button class="reset-btn" onclick="moveAll('wait2','court2')" style="font-size: 18px;">2코트</button><button class="reset-btn" onclick="moveAll('wait2','court3')" style="font-size: 18px;">3코트</button><button class="reset-btn" onclick="moveAll('wait2','court4')" style="font-size: 18px;">4코트</button></div>
-</div><div class="column" id="court1"><div class="header"><h4 style="font-size: 24px;">1코트</h4><button class="reset-btn" onclick="resetColumn('court1')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court1')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court2"><div class="header"><h4 style="font-size: 24px;">2코트</h4><button class="reset-btn" onclick="resetColumn('court2')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court2')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court3"><div class="header"><h4 style="font-size: 24px;">3코트</h4><button class="reset-btn" onclick="resetColumn('court3')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court3')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court4"><div class="header"><h4 style="font-size: 24px;">4코트</h4><button class="reset-btn" onclick="resetColumn('court4')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court4')" style="font-size: 18px;">종료</button></div></div></div><div class="namepool-row"><div class="column" id="namePool">
+</div><div class="column" id="court1"><div class="header"><h4 style="font-size: 24px;">1코트</h4><button class="reset-btn" onclick="resetColumn('court1')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court1')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court2"><div class="header"><h4 style="font-size: 24px;">2코트</h4><button class="reset-btn" onclick="resetColumn('court2')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court2')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court3"><div class="header"><h4 style="font-size: 24px;">3코트</h4><button class="reset-btn" onclick="resetColumn('court3')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court3')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court4"><div class="header"><h4 style="font-size: 24px;">4코트</h4><button class="reset-btn" onclick="resetColumn('court4')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court4')" style="font-size: 18px;">종료</button></div></div><div class="mobile-court-row"><div class="column" id="court1"><div class="header"><h4 style="font-size: 24px;">1코트</h4><button class="reset-btn" onclick="resetColumn('court1')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court1')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court2"><div class="header"><h4 style="font-size: 24px;">2코트</h4><button class="reset-btn" onclick="resetColumn('court2')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court2')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court3"><div class="header"><h4 style="font-size: 24px;">3코트</h4><button class="reset-btn" onclick="resetColumn('court3')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court3')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court4"><div class="header"><h4 style="font-size: 24px;">4코트</h4><button class="reset-btn" onclick="resetColumn('court4')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court4')" style="font-size: 18px;">종료</button></div></div></div><div class="mobile-wait-row"><div class="column" id="wait1">
+<div class="header">
+<h4 style="font-size: 24px;">대기 1</h4><button class="reset-btn" onclick="resetColumn('wait1')" style="font-size: 18px;">리셋</button>
+</div>
+<div class="sort-btns">
+<button class="reset-btn" onclick="moveAll('wait1','court1')" style="font-size: 18px;">1코트</button>
+<button class="reset-btn" onclick="moveAll('wait1','court2')" style="font-size: 18px;">2코트</button>
+<button class="reset-btn" onclick="moveAll('wait1','court3')" style="font-size: 18px;">3코트</button>
+<button class="reset-btn" onclick="moveAll('wait1','court4')" style="font-size: 18px;">4코트</button>
+</div>
+</div><div class="column" id="wait2">
+<div class="header">
+<h4 style="font-size: 24px;">대기 2</h4><button class="reset-btn" onclick="resetColumn('wait2')" style="font-size: 18px;">리셋</button>
+</div>
+<div class="sort-btns"><button class="reset-btn" onclick="moveAll('wait2','wait1')" style="font-size: 18px;">대기1</button><button class="reset-btn" onclick="moveAll('wait2','court1')" style="font-size: 18px;">1코트</button><button class="reset-btn" onclick="moveAll('wait2','court2')" style="font-size: 18px;">2코트</button><button class="reset-btn" onclick="moveAll('wait2','court3')" style="font-size: 18px;">3코트</button><button class="reset-btn" onclick="moveAll('wait2','court4')" style="font-size: 18px;">4코트</button></div>
+</div></div></div><div class="namepool-row"><div class="column" id="namePool">
 <div class="header"><h4 style="font-size: 24px;">대기</h4></div>
 <div class="sort-btns">
 <button class="reset-btn" onclick="resetAll()" style="font-size: 18px;">초기화</button>
@@ -359,6 +412,7 @@ function resetColumn(id) {
       const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
       ids.forEach(id => {
         new Sortable(document.getElementById(id), {
+  draggable: ".name-tag",
           group: "shared",
           animation: 150
         });
@@ -377,8 +431,7 @@ function resetAll() {
     const col = document.getElementById(id);
     col.querySelectorAll(".name-tag").forEach(tag => tag.remove());
   });
-}
-</script>
+}</script>
 <script>
   function applyBodyZoomAndFit() {
     const designWidth = 1920;
@@ -406,57 +459,42 @@ function resetAll() {
   window.addEventListener("load", applyBodyZoomAndFit);
 </script>
 <script>
-  const nameRef = db.ref("names");
+function syncToFirebase() {
+  const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+  const data = {};
+  ids.forEach(id => {
+    const col = document.getElementById(id);
+    data[id] = Array.from(col.querySelectorAll(".name-tag")).map(tag => ({
+      html: tag.outerHTML
+    }));
+  });
+  db.ref("/courtLayout").set(data);
+}
 
-  function syncToFirebase() {
-    const nameTags = document.querySelectorAll(".name-tag");
-    const data = {};
-    nameTags.forEach(tag => {
-      const id = btoa((tag.dataset.id || tag.innerText).trim());
-      data[id] = {
-        html: tag.outerHTML,
-        parentId: tag.parentElement.id || null
-      };
-    });
-    db.ref("names").set(data);
-  }
-
-  // Firebase로부터 데이터 받아서 반영
-  db.ref("names").on("value", (snapshot) => {
+function listenFromFirebase() {
+  db.ref("/courtLayout").on("value", snapshot => {
     const data = snapshot.val();
     if (!data) return;
-    // 기존 태그 제거
-    document.querySelectorAll(".name-tag").forEach(el => el.remove());
-    for (const id in data) {
-      const wrapper = document.createElement("div");
-      wrapper.innerHTML = data[id].html;
-      const element = wrapper.firstChild;
-      if (!element.dataset) continue;
-      element.dataset.id = id;
-      document.getElementById(data[id].parentId)?.appendChild(element);
-    }
+    Object.keys(data).forEach(id => {
+      const col = document.getElementById(id);
+      if (!col) return;
+      col.innerHTML = "";
+      data[id].forEach(item => {
+        const temp = document.createElement("div");
+        temp.innerHTML = item.html;
+        const tag = temp.firstChild;
+        if (tag) col.appendChild(tag);
+      });
+    });
   });
+}
 
-  // 기존 이벤트들에 저장 연동
-  document.addEventListener("click", e => {
-    if (e.target.classList.contains("create-btn")) {
-      setTimeout(syncToFirebase, 100);
-    } else if (e.target.classList.contains("reset-btn") || e.target.classList.contains("end-btn")) {
-      setTimeout(syncToFirebase, 100);
-    }
-  });
+window.addEventListener("load", () => {
+  listenFromFirebase();
+  setTimeout(syncToFirebase, 200); // 초기 sync (optional)
+});
 
-  // 이름표 삭제 시 동기화
-  document.addEventListener("contextmenu", (e) => {
-    if (e.target.classList.contains("name-tag")) {
-      setTimeout(syncToFirebase, 100);
-    }
-  });
-
-  // 드래그 앤 드롭 후에도 동기화
-  document.addEventListener("mouseup", (e) => {
-    setTimeout(syncToFirebase, 100);
-  });
+// 이름표 관련 함수 후에도 syncToFirebase()를 수동으로 호출하도록 해야 함
 </script>
 </body>
 </html>
