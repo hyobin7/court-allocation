@@ -6,23 +6,6 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>배드민턴 코트 배정</title>
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
-    authDomain: "cock-5c32d.firebaseapp.com",
-    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
-    projectId: "cock-5c32d",
-    storageBucket: "cock-5c32d.appspot.com",
-    messagingSenderId: "639370966543",
-    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a",
-    measurementId: "G-FLZSZVBPHC"
-  };
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
-</script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
 function moveAll(fromId, toId) {
   const from = document.getElementById(fromId);
@@ -432,22 +415,91 @@ function resetAll() {
     col.querySelectorAll(".name-tag").forEach(tag => tag.remove());
   });
 }</script>
-
-
-
 <script>
-function initializeIfEmpty() {
-  db.ref("/courtLayout").once("value").then(snapshot => {
-    if (!snapshot.exists()) {
-      syncToFirebase(); // 최초 로드 시 구조 저장
-    }
-  });
-}
+  function applyBodyZoomAndFit() {
+    const designWidth = 1920;
+    const designHeight = 1080;
+    const scaleX = window.innerWidth / designWidth;
+    const scaleY = window.innerHeight / designHeight;
+    const scale = Math.min(scaleX, scaleY);
+    document.body.style.zoom = scale;
 
-window.addEventListener("load", () => {
-  listenFromFirebase();
-  initializeIfEmpty(); // 추가: 없으면 초기값 넣기
-});
+    // namePool 높이 자동 조정
+    const h2 = document.querySelector("h2")?.offsetHeight || 0;
+    const textarea = document.querySelector("textarea")?.offsetHeight || 0;
+    const button = document.querySelector(".btn")?.offsetHeight || 0;
+    const layout = document.querySelector(".layout")?.offsetHeight || 0;
+    const totalUsed = h2 + textarea + button + layout + 40; // 여유 margin 포함
+    const available = window.innerHeight - totalUsed;
+
+    const namePool = document.getElementById("namePool");
+    if (namePool) {
+      namePool.style.height = available + "px";
+    }
+  }
+
+  window.addEventListener("resize", applyBodyZoomAndFit);
+  window.addEventListener("load", applyBodyZoomAndFit);
+</script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBQnSbBwJR-IS1aOuNrJz4qopK3RSiZbGY",
+    authDomain: "cock-5c32d.firebaseapp.com",
+    databaseURL: "https://cock-5c32d-default-rtdb.firebaseio.com",
+    projectId: "cock-5c32d",
+    storageBucket: "cock-5c32d.appspot.com",
+    messagingSenderId: "639370966543",
+    appId: "1:639370966543:web:84bdc6f474a7ba8cbc557a",
+    measurementId: "G-FLZSZVBPHC"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  function saveToFirebase() {
+    const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+    const data = {};
+    ids.forEach(id => {
+      const col = document.getElementById(id);
+      const tags = Array.from(col.querySelectorAll(".name-tag"));
+      data[id] = tags.map(tag => ({ html: tag.outerHTML }));
+    });
+    db.ref("/courtLayout").set(data);
+  }
+
+  function listenFromFirebase() {
+    db.ref("/courtLayout").on("value", snapshot => {
+      const data = snapshot.val();
+      if (!data) return;
+      Object.keys(data).forEach(id => {
+        const col = document.getElementById(id);
+        if (!col) return;
+        col.innerHTML = "";
+        data[id].forEach(item => {
+          const temp = document.createElement("div");
+          temp.innerHTML = item.html;
+          const tag = temp.firstChild;
+          if (tag) col.appendChild(tag);
+        });
+      });
+    });
+  }
+
+  window.addEventListener("load", () => {
+    listenFromFirebase();
+
+    const observer = new MutationObserver(saveToFirebase);
+    const config = { childList: true, subtree: true };
+    const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+    ids.forEach(id => {
+      const target = document.getElementById(id);
+      if (target) observer.observe(target, config);
+    });
+  });
 </script>
 </body>
 </html>
