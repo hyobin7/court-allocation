@@ -232,10 +232,23 @@ function resetAll() {
   }
 }
 </style>
+
+<!-- Firebase App (the core Firebase SDK) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
-
+<script>
+  const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT_ID.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
 </head>
 <body>
 <h2>배드민턴 코트 배정</h2>
@@ -445,124 +458,65 @@ function resetAll() {
   window.addEventListener("resize", applyBodyZoomAndFit);
   window.addEventListener("load", applyBodyZoomAndFit);
 </script>
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-  let draggedItem = null;
-
-  function enableMobileDragAndDrop() {
-    const draggables = document.querySelectorAll(".name-label");
-    const containers = document.querySelectorAll(".dropzone");
-
-    draggables.forEach(item => {
-      item.addEventListener("touchstart", (e) => {
-        draggedItem = item;
-        item.style.opacity = "0.5";
-      });
-
-      item.addEventListener("touchend", (e) => {
-        item.style.opacity = "1";
-        draggedItem = null;
-      });
-    });
-
-    containers.forEach(container => {
-      container.addEventListener("touchmove", (e) => {
-        e.preventDefault();
-      });
-
-      container.addEventListener("touchend", (e) => {
-        if (draggedItem) {
-          container.appendChild(draggedItem);
-          draggedItem = null;
-        }
-      });
-    });
-  }
-
-  enableMobileDragAndDrop();
-});
-</script>
-
 
 <script>
-function saveToFirebase() {
-  const layout = {};
-  document.querySelectorAll(".column").forEach(col => {
-    const id = col.id;
-    layout[id] = [];
-    col.querySelectorAll(".name-label").forEach(tag => {
-      layout[id].push({
-        name: tag.querySelector(".name")?.innerText || "",
-        grade: tag.querySelector(".grade")?.innerText || "",
-        gender: tag.dataset.gender || "",
-        count: tag.dataset.count || "0"
-      });
+// Firebase 실시간 동기화 기능
+
+const columnIds = ["namePool", "wait1", "wait2", "court1", "court2", "court3", "court4"];
+
+// 이름표 상태를 Firebase에 저장
+function syncToFirebase() {
+  const data = {};
+  columnIds.forEach(id => {
+    const column = document.getElementById(id);
+    const tags = Array.from(column.querySelectorAll(".name-tag")).map(tag => {
+      return {
+        key: tag.dataset.key,
+        name: tag.textContent.replace(/\s[SA-DF]\s*\d*$/, ""),
+        level: tag.textContent.split(" ")[1],
+        gender: tag.classList.contains("male") ? "남" : "여",
+        badge: tag.querySelector(".badge")?.textContent || "0"
+      };
     });
+    data[id] = tags;
   });
-  window.firebase.database().ref("layout").set(layout)
-    .then(() => console.log("✅ 저장됨:", layout))
-    .catch(e => console.error("❌ 저장 실패:", e));
+  db.ref("tags").set(data);
 }
 
-function listenFromFirebase() {
-  window.firebase.database().ref("layout").on("value", (snapshot) => {
+// Firebase 데이터로 UI 업데이트
+function loadFromFirebase() {
+  db.ref("tags").on("value", snapshot => {
     const data = snapshot.val();
-    if (data) {
-      console.log("✅ 불러옴:", data);
-      for (const id in data) {
-        const col = document.getElementById(id);
-        if (!col) continue;
-        const header = col.querySelector(".header");
-        const controls = col.querySelector(".control");
-        col.innerHTML = "";
-        if (header) col.appendChild(header);
-        if (controls) col.appendChild(controls);
-        data[id].forEach(item => {
-          const tag = document.createElement("div");
-          tag.className = "name-label";
-          tag.draggable = true;
-          tag.dataset.gender = item.gender;
-          tag.dataset.count = item.count || "0";
-          tag.innerHTML = `
-            <span class="name">${item.name}</span>
-            <span class="grade">${item.grade}</span>
-            <span class="badge">${item.count || "0"}</span>
-            <button class="delete">X</button>
-          `;
-          col.appendChild(tag);
+    if (!data) return;
+    columnIds.forEach(id => {
+      const col = document.getElementById(id);
+      col.innerHTML = "";
+      if (data[id]) {
+        data[id].forEach(tag => {
+          const tagEl = createTag(tag.key, tag);
+          tagEl.querySelector(".badge").textContent = tag.badge;
+          col.appendChild(tagEl);
         });
       }
-      initializeDragAndDrop(); // 이벤트 재설정
-    }
+    });
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  listenFromFirebase();
-
-  const createBtn = document.getElementById("createBtn");
-  if (createBtn) {
-    createBtn.addEventListener("click", () => {
-      setTimeout(saveToFirebase, 400);
-    });
-  }
-
-  document.addEventListener("drop", () => {
-    setTimeout(saveToFirebase, 400);
+// 이벤트 후 동기화
+function observeMutationAndSync() {
+  const config = { childList: true, subtree: true };
+  const observer = new MutationObserver(() => {
+    syncToFirebase();
   });
-
-  document.body.addEventListener("click", (e) => {
-    if (
-      e.target.matches(".delete") ||
-      e.target.matches(".reset-btn") ||
-      e.target.matches(".exit-btn") ||
-      e.target.matches(".sort-btn")
-    ) {
-      setTimeout(saveToFirebase, 400);
-    }
+  columnIds.forEach(id => {
+    const target = document.getElementById(id);
+    observer.observe(target, config);
   });
+}
 
-  console.log("✅ Firebase 실시간 동기화 연결 완료");
+window.addEventListener("load", () => {
+  loadFromFirebase();
+  observeMutationAndSync();
 });
 </script>
 </body>
