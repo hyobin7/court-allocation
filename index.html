@@ -276,6 +276,27 @@ function resetAll() {
 </div>
 </div></div>
 <script>
+function addDeleteButtonsToExistingTags() {
+  const tags = document.querySelectorAll(".name-tag");
+  tags.forEach(tag => {
+    if (!tag.querySelector("button")) {
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "❌";
+      delBtn.style.position = "absolute";
+      delBtn.style.top = "2px";
+      delBtn.style.right = "2px";
+      delBtn.style.background = "transparent";
+      delBtn.style.border = "none";
+      delBtn.style.color = "red";
+      delBtn.style.fontSize = "16px";
+      delBtn.style.cursor = "pointer";
+      delBtn.onclick = () => tag.remove();
+      tag.appendChild(delBtn);
+    }
+  });
+}
+
+
     function createTag(key, data) {
       const tag = document.createElement("div");
       tag.className = "name-tag";
@@ -390,6 +411,7 @@ function resetColumn(id) {
     }
 
     window.onload = () => {
+  addDeleteButtonsToExistingTags();
       document.getElementById("generateBtn").onclick = generateTags;
       document.getElementById("inputArea").addEventListener("keydown", e => {
         if (e.key === "Enter" && !e.shiftKey) {
