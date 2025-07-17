@@ -508,6 +508,7 @@ function syncFromFirebase() {
       const val = snapshot.val();
       if (val !== null && el.innerHTML !== val) {
         el.innerHTML = val;
+        addDeleteButtonsToExistingTags();
       }
     });
   });
