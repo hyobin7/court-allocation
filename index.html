@@ -294,14 +294,7 @@ function resetAll() {
         tag.remove();
       });
 
-      tag.addEventListener("touchend", function(e) {
-        if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
-          tag.dataset.lastTouch = Date.now();
-        } else {
-          tag.remove();
-          tag.dataset.lastTouch = 0;
-        }
-      });
+      
 
       return tag;
     }
@@ -441,7 +434,6 @@ function resetAll() {
   window.addEventListener("resize", applyBodyZoomAndFit);
   window.addEventListener("load", applyBodyZoomAndFit);
 </script>
-
 <!-- Firebase 실시간 동기화 스크립트 -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -500,6 +492,5 @@ window.addEventListener("load", () => {
   observeChanges();
 });
 </script>
-
 </body>
 </html>
