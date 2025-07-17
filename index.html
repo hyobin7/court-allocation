@@ -289,6 +289,19 @@ function resetAll() {
       badge.ondblclick = () => editBadge(badge);
       tag.appendChild(badge);
 
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "❌";
+      delBtn.style.position = "absolute";
+      delBtn.style.top = "2px";
+      delBtn.style.right = "2px";
+      delBtn.style.background = "transparent";
+      delBtn.style.border = "none";
+      delBtn.style.color = "red";
+      delBtn.style.fontSize = "16px";
+      delBtn.style.cursor = "pointer";
+      delBtn.onclick = () => tag.remove();
+      tag.appendChild(delBtn);
+
       tag.addEventListener("contextmenu", e => {
         e.preventDefault();
         tag.remove();
