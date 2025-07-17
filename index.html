@@ -139,6 +139,35 @@ function resetAll() {
   padding-top: 10px;
 }
 </style>
+
+<!-- Firebase App (the core Firebase SDK) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC0caXzAibBt9caNKOnEwEzq3kEtKgABdw",
+    authDomain: "cock-9ca00.firebaseapp.com",
+    databaseURL: "https://cock-9ca00-default-rtdb.firebaseio.com",
+    projectId: "cock-9ca00",
+    storageBucket: "cock-9ca00.firebasestorage.app",
+    messagingSenderId: "1097422224517",
+    appId: "1:1097422224517:web:e103a3b4d57896fd627dec"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+    apiKey: "AIzaSyD-firebase-placeholder",
+    authDomain: "your-project.firebaseapp.com",
+    databaseURL: "https://your-project.firebaseio.com",
+    projectId: "your-project-id",
+    storageBucket: "your-project.appspot.com",
+    messagingSenderId: "your-messaging-id",
+    appId: "your-app-id"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+</script>
+
 </head>
 <body>
 <h2>배드민턴 코트 배정</h2>
@@ -332,6 +361,56 @@ function resetAll() {
 
   window.addEventListener("resize", applyBodyZoomAndFit);
   window.addEventListener("load", applyBodyZoomAndFit);
+
+// Firebase 실시간 동기화 기능
+function syncStateToFirebase() {
+  const state = {};
+  const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+  ids.forEach(id => {
+    const tags = Array.from(document.getElementById(id).querySelectorAll(".name-tag")).map(tag => {
+      return {
+        text: tag.textContent.replace(/\s*\d+\s*$/, "").trim(),
+        gender: tag.classList.contains("male") ? "남" : "여",
+        badge: tag.querySelector(".badge")?.textContent || "0"
+      };
+    });
+    state[id] = tags;
+  });
+  db.ref("court-state").set(state);
+}
+
+function applyStateFromFirebase(state) {
+  const ids = Object.keys(state);
+  ids.forEach(id => {
+    const container = document.getElementById(id);
+    container.innerHTML = "";
+    state[id].forEach(data => {
+      const tag = createTag(data.text + Math.random(), {
+        name: data.text.split(" ")[0],
+        level: data.text.split(" ")[1],
+        gender: data.gender
+      });
+      tag.querySelector(".badge").textContent = data.badge;
+      container.appendChild(tag);
+    });
+  });
+}
+
+// 이벤트: 드래그 drop 이후 상태 저장
+const observer = new MutationObserver(syncStateToFirebase);
+window.addEventListener("load", () => {
+  const targetNodes = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+  targetNodes.forEach(id => {
+    observer.observe(document.getElementById(id), { childList: true, subtree: false });
+  });
+
+  // Firebase로부터 최초 데이터 로드 및 실시간 반영
+  db.ref("court-state").on("value", (snapshot) => {
+    const data = snapshot.val();
+    if (data) applyStateFromFirebase(data);
+  });
+});
+
 </script>
 </body>
 </html>
