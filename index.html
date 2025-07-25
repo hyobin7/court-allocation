@@ -334,7 +334,99 @@ function resetAll() {
   window.addEventListener("load", applyBodyZoomAndFit);
 </script>
 
-<script type="module" src="./firebase-config.js"></script>
-<script type="module" src="./sync.js"></script>
+
+
+
+<script type="module">
+
+// firebase-config.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC0caXzAibBt9caNKOnEwEzq3kEtKgABdw",
+  authDomain: "cock-9ca00.firebaseapp.com",
+  databaseURL: "https://cock-9ca00-default-rtdb.firebaseio.com",
+  projectId: "cock-9ca00",
+  storageBucket: "cock-9ca00.firebasestorage.app",
+  messagingSenderId: "1097422224517",
+  appId: "1:1097422224517:web:e103a3b4d57896fd627dec",
+  measurementId: "G-T5RMLR8QK5"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+export { db, ref, onValue, set, remove };
+
+
+
+// sync.js
+import { db, ref, onValue, set, remove } from './firebase-config.js';
+
+function generateUUID() {
+  return '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function syncTagToFirebase(tagEl, containerId) {
+  const key = tagEl.dataset.key || generateUUID();
+  tagEl.dataset.key = key;
+  const badge = tagEl.querySelector(".badge")?.textContent || "0";
+  const data = {
+    text: tagEl.textContent.replace(badge, '').trim(),
+    gender: tagEl.classList.contains("male") ? "남" : "여",
+    badge: badge,
+    container: containerId
+  };
+  set(ref(db, "tags/" + key), data);
+}
+
+function removeTagFromFirebase(key) {
+  remove(ref(db, "tags/" + key));
+}
+
+function setupSync() {
+  const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    new MutationObserver(() => {
+      el.querySelectorAll(".name-tag").forEach(tag => {
+        syncTagToFirebase(tag, id);
+      });
+    }).observe(el, { childList: true, subtree: false });
+  });
+
+  onValue(ref(db, "tags"), snapshot => {
+    const containerMap = {};
+    const tags = snapshot.val();
+    if (!tags) return;
+
+    Object.keys(tags).forEach(key => {
+      const data = tags[key];
+      if (!containerMap[data.container]) {
+        containerMap[data.container] = document.getElementById(data.container);
+      }
+
+      if (!document.querySelector(`[data-key="${key}"]`)) {
+        const tag = document.createElement("div");
+        tag.className = "name-tag";
+        tag.dataset.key = key;
+        tag.textContent = data.text;
+        tag.classList.add(data.gender === "남" ? "male" : "female");
+
+        const badge = document.createElement("div");
+        badge.className = "badge";
+        badge.textContent = data.badge;
+        tag.appendChild(badge);
+
+        containerMap[data.container]?.appendChild(tag);
+      }
+    });
+  });
+}
+
+window.addEventListener("load", setupSync);
+
+</script>
 </body>
 </html>
