@@ -1,0 +1,429 @@
+
+<!DOCTYPE html>
+
+<html lang="ko">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>배드민턴 코트 배정</title>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
+function moveAll(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  from.querySelectorAll('.name-tag').forEach(tag => to.appendChild(tag));
+}
+
+function resetAll() {
+  const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+  ids.forEach(id => {
+    const col = document.getElementById(id);
+    col.querySelectorAll(".name-tag").forEach(tag => tag.remove());
+  });
+}
+</script>
+<style>
+    body { font-family: Arial, sans-serif; background: #f0f8ff; padding: 1em; }
+    h2 { text-align: center; }
+    textarea { width: 100%; height: 100px; font-size: 16px; margin-bottom: 1em; }
+    .btn { width: 100%; padding: 12px; background-color: #007bff; color: white; font-size: 16px; border: none; border-radius: 8px; margin-bottom: 20px; cursor: pointer; }
+    .layout { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+    .column { background: white; border: 2px solid #ccc; border-radius: 8px; padding: 10px; flex: 1; min-width: 200px; min-height: 150px; position: relative; }
+    .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+    .reset-btn { background: #ff6666; color: white; border: none; padding: 4px 8px; border-radius: 5px; font-size: 12px; cursor: pointer; }
+    .name-tag {
+    font-size: 20px;
+    padding: 10px 12px;
+    line-height: 24px;
+    min-height: 32px; display: inline-block; margin: 5px; padding: 8px 10px; border: 2px solid #444; border-radius: 6px; font-size: 14px; font-weight: bold; background: #ffffcc; position: relative; }
+    .male { background-color: #cce5ff; border-color: #3399ff; }
+    .female { background-color: #ffd6e8; border-color: #ff66b2; }
+    
+
+
+.badge {
+  position: absolute;
+  top: -0.5em;
+  left: -0.5em;
+  background: #800020;
+  color: white;
+  font-size: 0.8em;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5em;
+  border-radius: 50%;
+  text-align: center;
+  z-index: 10;
+  cursor: pointer;
+}
+
+
+
+    .sort-btns { display: flex; gap: 5px; margin-top: 5px; }
+  
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+}
+.header h4 {
+  margin: 0;
+  white-space: nowrap;
+}
+
+.layout {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.layout > div {
+  flex: 1 0 auto;
+  margin: 5px;
+}
+
+.namepool-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+#namePool {
+  width: 95%;
+}
+
+#wait1, #wait2 {
+  flex: 0 0 18%;
+  min-width: 200px;
+  flex: 0 0 16%;
+  min-width: 180px;
+}
+#wait2 .sort-btns {
+  display: flex;
+  gap: 5px;
+  margin-top: 5px;
+}
+#wait2 .sort-btns button {
+  white-space: nowrap;
+}
+
+.name-tag 
+
+
+.badge {
+  position: absolute;
+  top: -0.5em;
+  left: -0.5em;
+  background: #800020;
+  color: white;
+  font-size: 0.8em;
+  width: 1.5em;
+  height: 1.5em;
+  line-height: 1.5em;
+  border-radius: 50%;
+  text-align: center;
+  z-index: 10;
+  cursor: pointer;
+}
+
+
+
+.name-tag {
+    font-size: 20px;
+    padding: 10px 12px;
+    line-height: 24px;
+    min-height: 32px;
+  position: relative;
+  padding-left: 10px;
+  padding-top: 10px;
+}
+</style>
+</head>
+<body>
+<h2>배드민턴 코트 배정</h2>
+<textarea id="inputArea" placeholder="이름 급수 성별 입력"></textarea>
+<button class="btn" id="generateBtn" style="font-size: 20px;">이름표 만들기</button>
+<div class="layout"><div class="column" id="wait1">
+<div class="header">
+<h4 style="font-size: 24px;">대기 1</h4><button class="reset-btn" onclick="resetColumn('wait1')" style="font-size: 18px;">리셋</button>
+</div>
+<div class="sort-btns" style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px;">
+<button class="reset-btn" onclick="moveAll('wait1','court1')" style="font-size: 18px;">1코트</button>
+<button class="reset-btn" onclick="moveAll('wait1','court2')" style="font-size: 18px;">2코트</button>
+<button class="reset-btn" onclick="moveAll('wait1','court3')" style="font-size: 18px;">3코트</button>
+<button class="reset-btn" onclick="moveAll('wait1','court4')" style="font-size: 18px;">4코트</button>
+</div>
+</div><div class="column" id="wait2">
+<div class="header">
+<h4 style="font-size: 24px;">대기 2</h4><button class="reset-btn" onclick="resetColumn('wait2')" style="font-size: 18px;">리셋</button>
+</div>
+<div class="sort-btns" style="display: flex; flex-wrap: wrap; gap: 5px; margin-top: 5px;"><button class="reset-btn" onclick="moveAll('wait2','wait1')" style="font-size: 18px;">대기1</button><button class="reset-btn" onclick="moveAll('wait2','court1')" style="font-size: 18px;">1코트</button><button class="reset-btn" onclick="moveAll('wait2','court2')" style="font-size: 18px;">2코트</button><button class="reset-btn" onclick="moveAll('wait2','court3')" style="font-size: 18px;">3코트</button><button class="reset-btn" onclick="moveAll('wait2','court4')" style="font-size: 18px;">4코트</button></div>
+</div><div class="column" id="court1"><div class="header"><h4 style="font-size: 24px;">1코트</h4><button class="reset-btn" onclick="resetColumn('court1')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court1')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court2"><div class="header"><h4 style="font-size: 24px;">2코트</h4><button class="reset-btn" onclick="resetColumn('court2')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court2')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court3"><div class="header"><h4 style="font-size: 24px;">3코트</h4><button class="reset-btn" onclick="resetColumn('court3')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court3')" style="font-size: 18px;">종료</button></div></div><div class="column" id="court4"><div class="header"><h4 style="font-size: 24px;">4코트</h4><button class="reset-btn" onclick="resetColumn('court4')" style="font-size: 18px;">리셋</button><button class="reset-btn" onclick="endCourt('court4')" style="font-size: 18px;">종료</button></div></div></div><div class="namepool-row"><div class="column" id="namePool">
+<div class="header"><h4 style="font-size: 24px;">대기</h4></div>
+<div class="sort-btns">
+<button class="reset-btn" onclick="resetAll()" style="font-size: 18px;">초기화</button>
+<button class="reset-btn" onclick="sortNamePool('급수정렬')" style="font-size: 18px;">급수정렬</button>
+<button class="reset-btn" onclick="sortNamePool('횟수정렬')" style="font-size: 18px;">횟수정렬</button>
+</div>
+</div></div>
+<script>
+    function createTag(key, data) {
+      const tag = document.createElement("div");
+      tag.className = "name-tag";
+      tag.dataset.key = key;
+      tag.textContent = data.name + " " + data.level;
+      tag.classList.add(data.gender === "남" ? "male" : "female");
+
+      const badge = document.createElement("div");
+      badge.className = "badge";
+      badge.textContent = "0";
+      badge.ondblclick = () => editBadge(badge);
+      tag.appendChild(badge);
+
+      tag.addEventListener("contextmenu", e => {
+        e.preventDefault();
+        tag.remove();
+      });
+
+      tag.addEventListener("touchend", function(e) {
+        if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
+          tag.dataset.lastTouch = Date.now();
+        } else {
+          tag.remove();
+          tag.dataset.lastTouch = 0;
+        }
+      });
+
+      return tag;
+    }
+
+    function generateTags() {
+      const input = document.getElementById("inputArea").value.trim();
+      const lines = input.split("\n");
+      lines.forEach(line => {
+        const parts = line.trim().split(" ");
+        if (parts.length >= 3) {
+          const name = parts[0];
+          const level = parts[1];
+          const gender = parts[2];
+          const tag = createTag(name + Date.now(), { name: name.toUpperCase(), level: level.toUpperCase(), gender: gender.toUpperCase() });
+          document.getElementById("namePool").appendChild(tag);
+        }
+      });
+      document.getElementById("inputArea").value = "";
+    }
+
+    function editBadge(badgeEl) {
+      const oldValue = badgeEl.textContent;
+      const input = document.createElement("input");
+      input.type = "number";
+      input.value = oldValue;
+      input.style.width = "20px";
+      badgeEl.textContent = "";
+      badgeEl.appendChild(input);
+      input.focus();
+      input.onblur = () => {
+        const val = parseInt(input.value, 10);
+        badgeEl.textContent = isNaN(val) ? oldValue : val;
+      };
+      input.onkeydown = (e) => { if (e.key === "Enter") input.blur(); };
+    }
+
+    
+function resetColumn(id) {
+  const col = document.getElementById(id);
+  const pool = document.getElementById("namePool");
+  col.querySelectorAll(".name-tag").forEach(tag => pool.appendChild(tag));
+}
+
+
+    function endCourt(id) {
+      const col = document.getElementById(id);
+      const tags = col.querySelectorAll(".name-tag");
+      tags.forEach(tag => {
+        const badge = tag.querySelector(".badge");
+        if (badge) badge.textContent = parseInt(badge.textContent) + 1;
+        else {
+          const newBadge = document.createElement("div");
+          newBadge.className = "badge";
+          newBadge.textContent = "1";
+          newBadge.ondblclick = () => editBadge(newBadge);
+          tag.appendChild(newBadge);
+        }
+        document.getElementById("namePool").appendChild(tag);
+      });
+    }
+
+    function sortNamePool(type) {
+      const pool = document.getElementById("namePool");
+      const tags = Array.from(pool.querySelectorAll(".name-tag"));
+      tags.sort((a, b) => {
+        if (type === "급수정렬") {
+      const order = { "S": 0, "A": 1, "B": 2, "C": 3, "D": 4 };
+      const aLevel = a.textContent.trim().split(" ")[1].charAt(0).toUpperCase();
+      const bLevel = b.textContent.trim().split(" ")[1].charAt(0).toUpperCase();
+      return (order[aLevel] ?? 99) - (order[bLevel] ?? 99);
+    }
+        if (type === "횟수정렬") {
+          const aCount = parseInt(a.querySelector(".badge")?.textContent || 0);
+          const bCount = parseInt(b.querySelector(".badge")?.textContent || 0);
+          return aCount - bCount;
+        }
+        return 0;
+      });
+      tags.forEach(tag => pool.appendChild(tag));
+    }
+
+    window.onload = () => {
+      document.getElementById("generateBtn").onclick = generateTags;
+      document.getElementById("inputArea").addEventListener("keydown", e => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          generateTags();
+        }
+      });
+
+      const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+      ids.forEach(id => {
+        new Sortable(document.getElementById(id), {
+  draggable: ".name-tag",
+          group: "shared",
+          animation: 150
+        });
+      });
+    };
+  
+function moveAll(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  from.querySelectorAll('.name-tag').forEach(tag => to.appendChild(tag));
+}
+
+function resetAll() {
+  const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+  ids.forEach(id => {
+    const col = document.getElementById(id);
+    col.querySelectorAll(".name-tag").forEach(tag => tag.remove());
+  });
+}</script>
+<script>
+  function applyBodyZoomAndFit() {
+    const designWidth = 1920;
+    const designHeight = 1080;
+    const scaleX = window.innerWidth / designWidth;
+    const scaleY = window.innerHeight / designHeight;
+    const scale = Math.min(scaleX, scaleY);
+    document.body.style.zoom = scale;
+
+    // namePool 높이 자동 조정
+    const h2 = document.querySelector("h2")?.offsetHeight || 0;
+    const textarea = document.querySelector("textarea")?.offsetHeight || 0;
+    const button = document.querySelector(".btn")?.offsetHeight || 0;
+    const layout = document.querySelector(".layout")?.offsetHeight || 0;
+    const totalUsed = h2 + textarea + button + layout + 40; // 여유 margin 포함
+    const available = window.innerHeight - totalUsed;
+
+    const namePool = document.getElementById("namePool");
+    if (namePool) {
+      namePool.style.height = available + "px";
+    }
+  }
+
+  window.addEventListener("resize", applyBodyZoomAndFit);
+  window.addEventListener("load", applyBodyZoomAndFit);
+</script>
+
+<script type="module" src="./firebase-config.js"></script>
+<script type="module" src="./sync.js"></script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyC0caXzAibBt9caNKOnEwEzq3kEtKgABdw",
+  authDomain: "cock-9ca00.firebaseapp.com",
+  databaseURL: "https://cock-9ca00-default-rtdb.firebaseio.com",
+  projectId: "cock-9ca00",
+  storageBucket: "cock-9ca00.firebasestorage.app",
+  messagingSenderId: "1097422224517",
+  appId: "1:1097422224517:web:e103a3b4d57896fd627dec"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+function generateUUID() {
+  return '_' + Math.random().toString(36).substr(2, 9);
+}
+
+function syncTagToFirebase(tagEl, containerId) {
+  const key = tagEl.dataset.key || generateUUID();
+  tagEl.dataset.key = key;
+  const badge = tagEl.querySelector(".badge")?.textContent || "0";
+  const data = {
+    text: tagEl.textContent.replace(badge, '').trim(),
+    gender: tagEl.classList.contains("male") ? "남" : "여",
+    badge: badge,
+    container: containerId
+  };
+  set(ref(db, "tags/" + key), data);
+}
+
+function removeTagFromFirebase(tagEl) {
+  const key = tagEl.dataset.key;
+  if (key) remove(ref(db, "tags/" + key));
+}
+
+function observeDragAndSync() {
+  const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    new MutationObserver(() => {
+      el.querySelectorAll(".name-tag").forEach(tag => syncTagToFirebase(tag, id));
+    }).observe(el, { childList: true });
+  });
+}
+
+window.moveAll = function(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  from.querySelectorAll('.name-tag').forEach(tag => {
+    to.appendChild(tag);
+    syncTagToFirebase(tag, toId);
+  });
+}
+
+window.resetColumn = function(id) {
+  const col = document.getElementById(id);
+  const pool = document.getElementById("namePool");
+  col.querySelectorAll(".name-tag").forEach(tag => {
+    pool.appendChild(tag);
+    syncTagToFirebase(tag, "namePool");
+  });
+}
+
+window.endCourt = function(id) {
+  const col = document.getElementById(id);
+  const tags = col.querySelectorAll(".name-tag");
+  tags.forEach(tag => {
+    const badge = tag.querySelector(".badge");
+    if (badge) badge.textContent = parseInt(badge.textContent) + 1;
+    else {
+      const newBadge = document.createElement("div");
+      newBadge.className = "badge";
+      newBadge.textContent = "1";
+      tag.appendChild(newBadge);
+    }
+    document.getElementById("namePool").appendChild(tag);
+    syncTagToFirebase(tag, "namePool");
+  });
+}
+
+window.addEventListener("load", () => {
+  observeDragAndSync();
+});
+</script>
+</body>
+</html>
