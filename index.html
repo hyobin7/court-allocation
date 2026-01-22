@@ -7,6 +7,11 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>배드민턴 코트 배정</title>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js">
+function moveAll(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  from.querySelectorAll('.name-tag').forEach(tag => to.appendChild(tag));
+}
 
 function resetAll() {
   const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
@@ -15,7 +20,49 @@ function resetAll() {
     col.querySelectorAll(".name-tag").forEach(tag => tag.remove());
   });
 }
+
+function handleExcelUpload() {
+  const fileInput = document.getElementById('excelUpload');
+  const file = fileInput.files[0];
+  if (!file) {
+    alert('엑셀 파일을 선택해주세요.');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    const data = new Uint8Array(e.target.result);
+    const workbook = XLSX.read(data, { type: 'array' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+    let success = 0;
+    let fail = 0;
+
+    rows.forEach(row => {
+      const name = String(row['이름']).trim();
+      const level = String(row['급수']).trim().toUpperCase();
+      const gender = String(row['성별']).trim();
+
+      if (!name || !['S','A','B','C','D'].includes(level) || !['남','여'].includes(gender)) {
+        fail++;
+        return;
+      }
+
+      createNameTag(name, level, gender);
+      success++;
+    });
+
+    alert(`엑셀 업로드 완료\n성공: ${success}명 / 실패: ${fail}명`);
+    fileInput.value = '';
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
 </script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
     body { font-family: Arial, sans-serif; background: #f0f8ff; padding: 1em; }
     h2 { text-align: center; }
@@ -138,6 +185,12 @@ function resetAll() {
 <body>
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="이름 급수 성별 입력"></textarea>
+
+<div style="margin-top:8px;">
+  <input type="file" id="excelUpload" accept=".xlsx,.xls">
+  <button onclick="handleExcelUpload()">엑셀로 이름표 추가</button>
+</div>
+
 <button class="btn" id="generateBtn" style="font-size: 20px;">이름표 만들기</button>
 <div class="layout"><div class="column" id="wait1">
 <div class="header">
@@ -226,9 +279,27 @@ function resetAll() {
     }
 
     
+function resetColumn(id) {
+  const col = document.getElementById(id);
+  const pool = document.getElementById("namePool");
+  col.querySelectorAll(".name-tag").forEach(tag => pool.appendChild(tag));
+}
 
 
-            document.getElementById("namePool").appendChild(tag);
+    function endCourt(id) {
+      const col = document.getElementById(id);
+      const tags = col.querySelectorAll(".name-tag");
+      tags.forEach(tag => {
+        const badge = tag.querySelector(".badge");
+        if (badge) badge.textContent = parseInt(badge.textContent) + 1;
+        else {
+          const newBadge = document.createElement("div");
+          newBadge.className = "badge";
+          newBadge.textContent = "1";
+          newBadge.ondblclick = () => editBadge(newBadge);
+          tag.appendChild(newBadge);
+        }
+        document.getElementById("namePool").appendChild(tag);
       });
     }
 
@@ -271,6 +342,11 @@ function resetAll() {
       });
     };
   
+function moveAll(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to = document.getElementById(toId);
+  from.querySelectorAll('.name-tag').forEach(tag => to.appendChild(tag));
+}
 
 function resetAll() {
   const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
@@ -304,152 +380,6 @@ function resetAll() {
 
   window.addEventListener("resize", applyBodyZoomAndFit);
   window.addEventListener("load", applyBodyZoomAndFit);
-</script>
-
-<script type="module" src="./firebase-config.js"></script>
-<script type="module" src="./sync.js"></script>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyC0caXzAibBt9caNKOnEwEzq3kEtKgABdw",
-  authDomain: "cock-9ca00.firebaseapp.com",
-  databaseURL: "https://cock-9ca00-default-rtdb.firebaseio.com",
-  projectId: "cock-9ca00",
-  storageBucket: "cock-9ca00.firebasestorage.app",
-  messagingSenderId: "1097422224517",
-  appId: "1:1097422224517:web:e103a3b4d57896fd627dec"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-
-function generateUUID() {
-  return '_' + Math.random().toString(36).substr(2, 9);
-}
-
-function syncTagToFirebase(tagEl, containerId) {
-  const key = tagEl.dataset.key || generateUUID();
-  tagEl.dataset.key = key;
-  const badge = tagEl.querySelector(".badge")?.textContent || "0";
-  const data = {
-    text: tagEl.textContent.replace(badge, '').trim(),
-    gender: tagEl.classList.contains("male") ? "남" : "여",
-    badge: badge,
-    container: containerId
-  };
-  set(ref(db, "tags/" + key), data);
-}
-
-function removeTagFromFirebase(tagEl) {
-  const key = tagEl.dataset.key;
-  if (key) remove(ref(db, "tags/" + key));
-}
-
-function attachTagEvents(tag) {
-  tag.addEventListener("contextmenu", e => {
-    e.preventDefault();
-    removeTagFromFirebase(tag);
-    tag.remove();
-  });
-  tag.addEventListener("touchend", function(e) {
-    if (!tag.dataset.lastTouch || Date.now() - tag.dataset.lastTouch > 400) {
-      tag.dataset.lastTouch = Date.now();
-    } else {
-      removeTagFromFirebase(tag);
-      tag.remove();
-      tag.dataset.lastTouch = 0;
-    }
-  });
-}
-
-function createTagFromData(key, data) {
-  const tag = document.createElement("div");
-  tag.className = "name-tag";
-  tag.dataset.key = key;
-  tag.textContent = data.text;
-  tag.classList.add(data.gender === "남" ? "male" : "female");
-
-  const badge = document.createElement("div");
-  badge.className = "badge";
-  badge.textContent = data.badge || "0";
-  tag.appendChild(badge);
-
-  attachTagEvents(tag);
-  return tag;
-}
-
-// drag 이후 DOM 변화 감지
-function observeDragAndSync() {
-  const ids = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    new MutationObserver(() => {
-      el.querySelectorAll(".name-tag").forEach(tag => syncTagToFirebase(tag, id));
-    }).observe(el, { childList: true });
-  });
-}
-
-// 버튼 함수 교체 버전
-window.moveAll = function(fromId, toId) {
-  const from = document.getElementById(fromId);
-  const to = document.getElementById(toId);
-  from.querySelectorAll('.name-tag').forEach(tag => {
-    to.appendChild(tag);
-    syncTagToFirebase(tag, toId);
-  });
-};
-
-window.resetColumn = function(id) {
-  const col = document.getElementById(id);
-  const pool = document.getElementById("namePool");
-  col.querySelectorAll(".name-tag").forEach(tag => {
-    pool.appendChild(tag);
-    syncTagToFirebase(tag, "namePool");
-  });
-};
-
-window.endCourt = function(id) {
-  const col = document.getElementById(id);
-  const tags = col.querySelectorAll(".name-tag");
-  tags.forEach(tag => {
-    const badge = tag.querySelector(".badge");
-    if (badge) badge.textContent = parseInt(badge.textContent) + 1;
-    else {
-      const newBadge = document.createElement("div");
-      newBadge.className = "badge";
-      newBadge.textContent = "1";
-      tag.appendChild(newBadge);
-    }
-    document.getElementById("namePool").appendChild(tag);
-    syncTagToFirebase(tag, "namePool");
-  });
-};
-
-window.addEventListener("load", () => {
-  observeDragAndSync();
-
-  onValue(ref(db, "tags"), snapshot => {
-    const tags = snapshot.val();
-    if (!tags) return;
-
-    // 기존 태그 초기화
-    const allContainers = ["wait1", "wait2", "court1", "court2", "court3", "court4", "namePool"];
-    allContainers.forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.innerHTML = "";
-    });
-
-    // 다시 추가
-    Object.entries(tags).forEach(([key, data]) => {
-      const tag = createTagFromData(key, data);
-      const container = document.getElementById(data.container);
-      if (container) container.appendChild(tag);
-    });
-  });
-});
 </script>
 </body>
 </html>
