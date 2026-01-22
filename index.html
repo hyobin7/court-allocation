@@ -20,49 +20,7 @@ function resetAll() {
     col.querySelectorAll(".name-tag").forEach(tag => tag.remove());
   });
 }
-
-function handleExcelUpload() {
-  const fileInput = document.getElementById('excelUpload');
-  const file = fileInput.files[0];
-  if (!file) {
-    alert('엑셀 파일을 선택해주세요.');
-    return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = function (e) {
-    const data = new Uint8Array(e.target.result);
-    const workbook = XLSX.read(data, { type: 'array' });
-    const sheetName = workbook.SheetNames[0];
-    const sheet = workbook.Sheets[sheetName];
-    const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
-
-    let success = 0;
-    let fail = 0;
-
-    rows.forEach(row => {
-      const name = String(row['이름']).trim();
-      const level = String(row['급수']).trim().toUpperCase();
-      const gender = String(row['성별']).trim();
-
-      if (!name || !['S','A','B','C','D'].includes(level) || !['남','여'].includes(gender)) {
-        fail++;
-        return;
-      }
-
-      createNameTag(name, level, gender);
-      success++;
-    });
-
-    alert(`엑셀 업로드 완료\n성공: ${success}명 / 실패: ${fail}명`);
-    fileInput.value = '';
-  };
-
-  reader.readAsArrayBuffer(file);
-}
-
 </script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <style>
     body { font-family: Arial, sans-serif; background: #f0f8ff; padding: 1em; }
     h2 { text-align: center; }
@@ -181,6 +139,7 @@ function handleExcelUpload() {
   padding-top: 10px;
 }
 </style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <h2>배드민턴 코트 배정</h2>
