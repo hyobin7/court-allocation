@@ -145,7 +145,10 @@ function resetAll() {
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="이름 급수 성별 입력"></textarea>
 
-<div style="margin-top:8px;">
+<div style="margin-top:6px; font-size:12px; color:#555;">
+입력형식: 이름 급수 그룹 성별 (그룹 생략 가능)
+</div>
+<div style="margin-top:6px;">
   <input type="file" id="excelUpload" accept=".xlsx,.xls">
   <button id="excelCreateBtn">엑셀로 이름표 만들기</button>
 </div>
@@ -342,28 +345,51 @@ function resetAll() {
 </script>
 <script>
 (function(){
-  function formatLabel(name, level, group) {
-    if (group) {
-      const g = /^[a-zA-Z]+$/.test(group) ? group.toUpperCase() : group;
-      return `${name} ${level} ${g}`;
-    }
-    return `${name} ${level}`;
+
+  function normalizeGroup(group){
+    if(!group) return '';
+    return /^[a-zA-Z]+$/.test(group) ? group.toUpperCase() : group;
   }
 
+  // 🔹 기존 수동 생성 로직 확장 (그룹 포함)
+  if (typeof createNameTagsFromInput === 'function') {
+    const _old = createNameTagsFromInput;
+    window.createNameTagsFromInput = function(){
+      const input = document.getElementById('nameInput').value.trim();
+      if(!input) return;
+
+      input.split(/\n+/).forEach(line => {
+        const parts = line.trim().split(/\s+/);
+        if(parts.length < 3) return;
+
+        const name = parts[0];
+        const level = parts[1].toUpperCase();
+        const gender = parts[parts.length-1];
+        const group = parts.length === 4 ? normalizeGroup(parts[2]) : '';
+
+        const displayName = group ? `${name} ${group}` : name;
+        createNameTag(displayName, level, gender);
+      });
+
+      document.getElementById('nameInput').value = '';
+    };
+  }
+
+  // 🔹 엑셀 업로드
   document.addEventListener('DOMContentLoaded', function(){
     const btn = document.getElementById('excelCreateBtn');
-    if (!btn) return;
+    if(!btn) return;
 
     btn.addEventListener('click', function(){
-      const fileInput = document.getElementById('excelUpload');
-      const file = fileInput.files[0];
-      if (!file) {
-        alert('엑셀 파일을 선택해주세요.');
+      if (typeof createNameTag !== 'function') {
+        alert('createNameTag 함수를 찾을 수 없습니다.');
         return;
       }
 
-      if (typeof createNameTag !== 'function') {
-        alert('createNameTag 함수를 찾을 수 없습니다.');
+      const fileInput = document.getElementById('excelUpload');
+      const file = fileInput.files[0];
+      if(!file){
+        alert('엑셀 파일을 선택해주세요.');
         return;
       }
 
@@ -374,21 +400,22 @@ function resetAll() {
         const rows = XLSX.utils.sheet_to_json(sheet, { defval:'' });
 
         let s=0,f=0;
+
         rows.forEach(row => {
-          const name = String(row['이름'] || '').trim();
-          const level = String(row['급수'] || '').trim().toUpperCase();
-          const groupRaw = String(row['그룹'] || '').trim();
-          const group = /^[a-zA-Z]+$/.test(groupRaw) ? groupRaw.toUpperCase() : groupRaw;
+          const name = String(row['이름']||'').trim();
+          const level = String(row['급수']||'').trim().toUpperCase();
+          const gender = String(row['성별']||'').trim();
+          const group = normalizeGroup(String(row['그룹']||'').trim());
 
-          if (!name || !['S','A','B','C','D'].includes(level)) { f++; return; }
+          if(!name || !['S','A','B','C','D'].includes(level) || !gender){
+            f++; return;
+          }
 
-          // 기존 함수는 name, level, gender 구조 → name에 group 포함시켜 전달
           const displayName = group ? `${name} ${group}` : name;
-
-          try {
-            createNameTag(displayName, level, row['성별']);
+          try{
+            createNameTag(displayName, level, gender);
             s++;
-          } catch {
+          }catch(e){
             f++;
           }
         });
@@ -396,9 +423,11 @@ function resetAll() {
         alert(`엑셀 업로드 완료\n성공: ${s}명 / 실패: ${f}명`);
         fileInput.value='';
       };
+
       reader.readAsArrayBuffer(file);
     });
   });
+
 })();
 </script>
 </body>
