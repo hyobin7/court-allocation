@@ -145,7 +145,7 @@ function resetAll() {
 <h2>배드민턴 코트 배정</h2>
 <textarea id="inputArea" placeholder="이름 급수 성별 입력"></textarea>
 
-<div style="margin-top:6px;">
+<div style="margin-top:8px;">
   <input type="file" id="excelUpload" accept=".xlsx,.xls">
   <button id="excelCreateBtn">엑셀로 이름표 만들기</button>
 </div>
@@ -342,11 +342,12 @@ function resetAll() {
 </script>
 <script>
 (function(){
-  function findCreateFunction() {
-    if (typeof createNameTag === 'function') return 'createNameTag';
-    if (typeof createNameTags === 'function') return 'createNameTags';
-    if (typeof addNameTag === 'function') return 'addNameTag';
-    return null;
+  function formatLabel(name, level, group) {
+    if (group) {
+      const g = /^[a-zA-Z]+$/.test(group) ? group.toUpperCase() : group;
+      return `${name} ${level} ${g}`;
+    }
+    return `${name} ${level}`;
   }
 
   document.addEventListener('DOMContentLoaded', function(){
@@ -361,50 +362,40 @@ function resetAll() {
         return;
       }
 
-      const creatorName = findCreateFunction();
-      if (!creatorName) {
-        alert('이름표 생성 함수(createNameTag)가 파일에 없습니다.');
+      if (typeof createNameTag !== 'function') {
+        alert('createNameTag 함수를 찾을 수 없습니다.');
         return;
       }
 
-      const creator = window[creatorName];
-
       const reader = new FileReader();
       reader.onload = function(e){
-        const data = new Uint8Array(e.target.result);
-        const wb = XLSX.read(data, { type:'array' });
+        const wb = XLSX.read(new Uint8Array(e.target.result), { type:'array' });
         const sheet = wb.Sheets[wb.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { defval:'' });
 
         let s=0,f=0;
-
         rows.forEach(row => {
-          const name = String(row['이름'] || row['name'] || '').trim();
-          const level = String(row['급수'] || row['level'] || '').trim().toUpperCase();
-          const gender = String(row['성별'] || row['gender'] || '').trim();
+          const name = String(row['이름'] || '').trim();
+          const level = String(row['급수'] || '').trim().toUpperCase();
+          const groupRaw = String(row['그룹'] || '').trim();
+          const group = /^[a-zA-Z]+$/.test(groupRaw) ? groupRaw.toUpperCase() : groupRaw;
 
-          if (!name || !['S','A','B','C','D'].includes(level) || !['남','여'].includes(gender)) {
-            f++; return;
-          }
+          if (!name || !['S','A','B','C','D'].includes(level)) { f++; return; }
+
+          // 기존 함수는 name, level, gender 구조 → name에 group 포함시켜 전달
+          const displayName = group ? `${name} ${group}` : name;
 
           try {
-            // 3개 인자 함수
-            if (creator.length >= 3) {
-              creator(name, level, gender);
-            } else {
-              // 한 줄 문자열을 받는 구조
-              creator(name + ' ' + level + ' ' + gender);
-            }
+            createNameTag(displayName, level, row['성별']);
             s++;
-          } catch(e) {
+          } catch {
             f++;
           }
         });
 
         alert(`엑셀 업로드 완료\n성공: ${s}명 / 실패: ${f}명`);
-        fileInput.value = '';
+        fileInput.value='';
       };
-
       reader.readAsArrayBuffer(file);
     });
   });
